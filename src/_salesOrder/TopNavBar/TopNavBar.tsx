@@ -1,6 +1,6 @@
 import { Button, Stack, Typography } from "@mui/material";
 import { IconShoppingCart } from "@tabler/icons-react";
-import SearchBar from "../SearchBar/SearchBar";
+// import SearchBar from "../SearchBar/SearchBar";
 import { Suspense } from "react";
 
 export default function TopNavBar() {
@@ -15,9 +15,9 @@ export default function TopNavBar() {
       <Typography color={"grey.50"} variant="mdBold">
         Sales Order
       </Typography>
-      <Suspense>
+      {/* <Suspense>
         <SearchBar />
-      </Suspense>
+      </Suspense> */}
       <Button
         fullWidth
         href={"https://x.com"}

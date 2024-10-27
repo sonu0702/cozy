@@ -7,6 +7,7 @@ import { CozyTheme } from '@/_global/helper/constants';
 import { Box, Divider } from "@mui/material";
 import Nav from "@/_homePage/Nav/nav";
 import QuickActions from "@/_homePage/QuickActions/QuickActions";
+import { Suspense } from "react";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -35,41 +36,45 @@ export default function RootLayout({
           platformTheme={CozyTheme}
           fontName={"'Inter', sans-serif"}
         >
-          <NavBar>
-            <Box component={'main'}
-              display="grid"
-              gridTemplateColumns={{
-                xs: '100%',
-                lg: 'minmax(315px, 360px) minmax(500px, 1200px) minmax(315px, 360px)',
-              }}
-              gap={{ xs: '1rem', lg: '0' }}
-            >
-              <Box
-                paddingLeft={'2rem'}
-                paddingTop={'2rem'}>
-                <Nav />
-              </Box>
-              <Box display={'grid'}
-                gridTemplateColumns={'100%'}
-                gridTemplateRows={'auto'}
-                borderLeft={'1px solid'}
-                borderRight={'1px solid'}
-                borderColor={'grey.800'}
-                pb={{ xs: '0', md: '12px' }}
-                paddingTop={'2rem'}
-                paddingLeft={'2rem'}
-                paddingRight={'2rem'}
+          <Suspense fallback={<div>Loading...</div>}>
+            <NavBar>
+              <Box component={'main'}
+                display="grid"
+                gridTemplateColumns={{
+                  xs: '100%',
+                  lg: 'minmax(315px, 360px) minmax(500px, 1200px) minmax(315px, 360px)',
+                }}
+                gap={{ xs: '1rem', lg: '0' }}
               >
-                {children}
+                <Box
+                  paddingLeft={'2rem'}
+                  paddingTop={'2rem'}>
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <Nav />
+                  </Suspense>
+                </Box>
+                <Box display={'grid'}
+                  gridTemplateColumns={'100%'}
+                  gridTemplateRows={'auto'}
+                  borderLeft={'1px solid'}
+                  borderRight={'1px solid'}
+                  borderColor={'grey.800'}
+                  pb={{ xs: '0', md: '12px' }}
+                  paddingTop={'2rem'}
+                  paddingLeft={'2rem'}
+                  paddingRight={'2rem'}
+                >
+                  {children}
+                </Box>
+                <Box
+                  paddingTop={'2rem'}
+                  paddingLeft={'2rem'}>
+                  <QuickActions />
+                  <Divider sx={{ my: '1rem' }} />
+                </Box>
               </Box>
-              <Box
-                paddingTop={'2rem'}
-                paddingLeft={'2rem'}>
-                <QuickActions />
-                <Divider sx={{ my: '1rem' }} />
-              </Box>
-            </Box>
-          </NavBar>
+            </NavBar>
+          </Suspense>
         </ThemeRegistry>
       </body>
     </html>

@@ -1,6 +1,5 @@
 import { Button, Stack, Typography } from "@mui/material";
 import { IconPrinter } from "@tabler/icons-react";
-import SearchBar from "../SearchBar/SearchBar";
 
 export default function TopNavBar() {
   return (
@@ -14,7 +13,6 @@ export default function TopNavBar() {
       <Typography color={"grey.50"} variant="mdBold">
         Reports
       </Typography>
-      {/* <SearchBar /> */}
       <Button
         fullWidth
         href={"https://x.com"}

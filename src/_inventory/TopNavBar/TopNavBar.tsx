@@ -1,7 +1,9 @@
+'use client'
 import { Button, Stack, Typography } from "@mui/material";
 import { IconBox } from "@tabler/icons-react";
 import SearchBar from "../SearchBar/SearchBar";
 import { Suspense } from "react";
+import CircularLoader from "@/_global/components/LoadAndErrorBoundary/CircularLoader";
 
 export default function TopNavBar() {
   return (
@@ -15,7 +17,7 @@ export default function TopNavBar() {
       <Typography color={"grey.50"} variant="mdBold">
         Inventory
       </Typography>
-      <Suspense>
+      <Suspense fallback={<div>Loading search...</div>}>
         <SearchBar />
       </Suspense>
       <Button
