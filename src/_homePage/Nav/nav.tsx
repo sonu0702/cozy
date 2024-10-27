@@ -1,7 +1,18 @@
+"use client"
 import { Box, Button, Typography } from "@mui/material";
 import { IconBrandX } from "@tabler/icons-react";
+import { useRouter, usePathname } from "next/navigation";
 
 function Nav() {
+    const router = useRouter();
+    const currentPath = usePathname(); // Gets the current path directly from Next.js
+
+
+    const handleNavigation = (path: string) => {
+        if (path !== currentPath) {
+            router.push(path);
+        }
+    };
     return (
         <Box display={'flex'}
             flexDirection={'column'}
@@ -18,8 +29,9 @@ function Nav() {
 
             <Button
                 fullWidth
-                href={'/'}
-                variant="darkContained"
+                // href={'/'}
+                onClick={() => handleNavigation('/')}
+                variant={currentPath === '/' ? 'lightContained' : 'darkContained'}
                 // target="_blank"
                 startIcon={<IconBrandX size={16} />}
                 style={{ justifyContent: 'flex-start' }}
@@ -28,18 +40,21 @@ function Nav() {
             </Button>
             <Button
                 fullWidth
-                href={'/inventory'}
-                variant="darkContained"
+                // href={'/inventory'}
+                onClick={() => handleNavigation('/inventory')}
+                variant={currentPath === '/inventory' ? 'lightContained' : 'darkContained'}
                 // target="_blank"
                 style={{ justifyContent: 'flex-start' }}
                 startIcon={<IconBrandX size={16} />}
+
             >
                 Inventory
             </Button>
             <Button
                 fullWidth
-                href={'/salesorder'}
-                variant="darkContained"
+                // href={'/salesorder'}
+                onClick={() => handleNavigation('/salesorder')}
+                variant={currentPath === '/salesorder' ? 'lightContained' : 'darkContained'}
                 // target="_blank"
                 style={{ justifyContent: 'flex-start' }}
                 startIcon={<IconBrandX size={16} />}
@@ -48,8 +63,9 @@ function Nav() {
             </Button>
             <Button
                 fullWidth
-                href={'/suppliers'}
-                variant="darkContained"
+                // href={'/suppliers'}
+                onClick={() => handleNavigation('/suppliers')}
+                variant={currentPath === '/suppliers' ? 'lightContained' : 'darkContained'}
                 // target="_blank"
                 style={{ justifyContent: 'flex-start' }}
                 startIcon={<IconBrandX size={16} />}
@@ -58,8 +74,9 @@ function Nav() {
             </Button>
             <Button
                 fullWidth
-                href={'/reports'}
-                variant="darkContained"
+                // href={'/reports'}
+                onClick={() => handleNavigation('/reports')}
+                variant={currentPath === '/reports' ? 'lightContained' : 'darkContained'}
                 // target="_blank"
                 style={{ justifyContent: 'flex-start' }}
                 startIcon={<IconBrandX size={16} />}
