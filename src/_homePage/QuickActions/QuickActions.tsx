@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from "@mui/material";
-import { IconBrandX } from "@tabler/icons-react";
+import { IconNotes, IconBox, IconTruck, IconDownload } from "@tabler/icons-react";
 
 function QuickActions() {
     return (
@@ -21,7 +21,7 @@ function QuickActions() {
                 href={'https://x.com'}
                 variant="darkContained"
                 target="_blank"
-                startIcon={<IconBrandX size={16} />}
+                startIcon={<IconNotes size={16} />}
                 style={{ justifyContent: 'flex-start' }}
             >
                 Create Order
@@ -32,7 +32,7 @@ function QuickActions() {
                 variant="darkContained"
                 target="_blank"
                 style={{ justifyContent: 'flex-start' }}
-                startIcon={<IconBrandX size={16} />}
+                startIcon={<IconBox size={16} />}
             >
                 Add Product
             </Button>
@@ -42,7 +42,7 @@ function QuickActions() {
                 variant="darkContained"
                 target="_blank"
                 style={{ justifyContent: 'flex-start' }}
-                startIcon={<IconBrandX size={16} />}
+                startIcon={<IconTruck size={16} />}
             >
                 Add Supplier
             </Button>
@@ -52,7 +52,7 @@ function QuickActions() {
                 variant="darkContained"
                 target="_blank"
                 style={{ justifyContent: 'flex-start' }}
-                startIcon={<IconBrandX size={16} />}
+                startIcon={<IconDownload size={16} />}
             >
                 Export
             </Button>

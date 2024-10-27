@@ -1,5 +1,5 @@
 import { Button, Stack, Typography } from "@mui/material";
-import { IconBrandX } from "@tabler/icons-react";
+import { IconPrinter } from "@tabler/icons-react";
 import SearchBar from "../SearchBar/SearchBar";
 
 export default function TopNavBar() {
@@ -20,7 +20,7 @@ export default function TopNavBar() {
         href={"https://x.com"}
         variant="darkContained"
         target="_blank"
-        startIcon={<IconBrandX size={16} />}
+        startIcon={<IconPrinter size={16} />}
         style={{ justifyContent: "flex-start" }}
       >
         Print Reports

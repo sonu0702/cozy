@@ -1,6 +1,8 @@
 "use client"
 import { Box, Button, Typography } from "@mui/material";
-import { IconBrandX } from "@tabler/icons-react";
+import { IconBrandX , IconLayoutDashboard,IconPackage,IconShoppingCart,
+    IconTruck, IconReportAnalytics, IconSettings, IconHeadset
+ } from "@tabler/icons-react";
 import { useRouter, usePathname } from "next/navigation";
 
 function Nav() {
@@ -33,7 +35,7 @@ function Nav() {
                 onClick={() => handleNavigation('/')}
                 variant={currentPath === '/' ? 'lightContained' : 'darkContained'}
                 // target="_blank"
-                startIcon={<IconBrandX size={16} />}
+                startIcon={<IconLayoutDashboard size={16} />}
                 style={{ justifyContent: 'flex-start' }}
             >
                 Dashboard
@@ -45,7 +47,7 @@ function Nav() {
                 variant={currentPath === '/inventory' ? 'lightContained' : 'darkContained'}
                 // target="_blank"
                 style={{ justifyContent: 'flex-start' }}
-                startIcon={<IconBrandX size={16} />}
+                startIcon={<IconPackage size={16} />}
 
             >
                 Inventory
@@ -57,7 +59,7 @@ function Nav() {
                 variant={currentPath === '/salesorder' ? 'lightContained' : 'darkContained'}
                 // target="_blank"
                 style={{ justifyContent: 'flex-start' }}
-                startIcon={<IconBrandX size={16} />}
+                startIcon={<IconShoppingCart size={16} />}
             >
                 Sales Orders
             </Button>
@@ -68,7 +70,7 @@ function Nav() {
                 variant={currentPath === '/suppliers' ? 'lightContained' : 'darkContained'}
                 // target="_blank"
                 style={{ justifyContent: 'flex-start' }}
-                startIcon={<IconBrandX size={16} />}
+                startIcon={<IconTruck size={16} />}
             >
                 Suppliers
             </Button>
@@ -79,7 +81,7 @@ function Nav() {
                 variant={currentPath === '/reports' ? 'lightContained' : 'darkContained'}
                 // target="_blank"
                 style={{ justifyContent: 'flex-start' }}
-                startIcon={<IconBrandX size={16} />}
+                startIcon={<IconReportAnalytics size={16} />}
             >
                 Reports
             </Button>
@@ -93,7 +95,7 @@ function Nav() {
                 variant="darkContained"
                 target="_blank"
                 style={{ justifyContent: 'flex-start' }}
-                startIcon={<IconBrandX size={16} />}
+                startIcon={<IconHeadset size={16} />}
             >
                 Help
             </Button>
@@ -103,7 +105,7 @@ function Nav() {
                 variant="darkContained"
                 target="_blank"
                 style={{ justifyContent: 'flex-start' }}
-                startIcon={<IconBrandX size={16} />}
+                startIcon={<IconSettings size={16} />}
             >
                 Settings
             </Button>
