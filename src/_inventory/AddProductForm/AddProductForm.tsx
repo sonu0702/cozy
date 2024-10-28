@@ -56,7 +56,7 @@ export default function AddProductForm({ open, onClose }: AddProductFormProps) {
     },
   });
 
-  const { mutateAsync, isLoading } = useMutation({
+  const { mutateAsync, isPending } = useMutation({
     mutationFn: addProduct,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -207,7 +207,7 @@ export default function AddProductForm({ open, onClose }: AddProductFormProps) {
           <Button
             type="submit"
             variant="contained"
-            disabled={isLoading}
+            disabled={isPending}
           >
             Add Product
           </Button>
