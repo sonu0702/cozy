@@ -4,8 +4,10 @@ import { IconBox } from "@tabler/icons-react";
 import SearchBar from "../SearchBar/SearchBar";
 import { Suspense } from "react";
 import CircularLoader from "@/_global/components/LoadAndErrorBoundary/CircularLoader";
-
-export default function TopNavBar() {
+interface TopNavBarProps {
+  onAddClick: () => void;
+}
+export default function TopNavBar({ onAddClick }: TopNavBarProps) {
   return (
     <Stack
       gap={3}
@@ -22,9 +24,8 @@ export default function TopNavBar() {
       </Suspense>
       <Button
         fullWidth
-        href={"https://x.com"}
+        onClick={onAddClick}
         variant="darkContained"
-        target="_blank"
         startIcon={<IconBox size={16} />}
         style={{ justifyContent: "flex-start" }}
       >
