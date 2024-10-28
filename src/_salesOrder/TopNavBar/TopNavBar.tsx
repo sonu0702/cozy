@@ -3,7 +3,12 @@ import { IconShoppingCart } from "@tabler/icons-react";
 // import SearchBar from "../SearchBar/SearchBar";
 import { Suspense } from "react";
 
-export default function TopNavBar() {
+
+interface TopNavBarProps {
+  onOpenForm: () => void;
+}
+
+export default function TopNavBar({onOpenForm} : TopNavBarProps) {
   return (
     <Stack
       gap={3}
@@ -15,14 +20,10 @@ export default function TopNavBar() {
       <Typography color={"grey.50"} variant="mdBold">
         Sales Order
       </Typography>
-      {/* <Suspense>
-        <SearchBar />
-      </Suspense> */}
       <Button
         fullWidth
-        href={"https://x.com"}
         variant="darkContained"
-        target="_blank"
+        onClick={onOpenForm}
         startIcon={<IconShoppingCart size={16} />}
         style={{ justifyContent: "flex-start" }}
       >

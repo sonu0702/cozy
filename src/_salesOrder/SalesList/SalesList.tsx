@@ -6,51 +6,56 @@ import {
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { useState } from "react";
 
-const productList = [
+const salesList = [
     {
         id: 1,
         name: "Macbook Pro",
         code: '#0001',
         type: 'Laptop',
-        price: 1.123,
+        total_price: 1.123,
         price_currency: '$',
-        quantity: 23
+        quantity: 23,
+        invoice:{}
     },
     {
         id: 2,
         name: "Macbook Pro",
         code: '#0001',
         type: 'Laptop',
-        price: 1.123,
+        total_price: 1.123,
         price_currency: '$',
-        quantity: 23
+        quantity: 23,
+        invoice:{}
     },
     {
         id: 3,
         name: "Macbook Pro",
         code: '#0001',
         type: 'Laptop',
-        price: 1.123,
+        total_price: 1.123,
         price_currency: '$',
-        quantity: 23
+        quantity: 23,
+        invoice:{}
     },
     {
         id: 4,
         name: "Macbook Pro",
         code: '#0001',
         type: 'Laptop',
-        price: 1.123,
+        total_price: 1.123,
         price_currency: '$',
-        quantity: 23
+        quantity: 23,
+        invoice:{}
     },
     {
         id: 5,
         name: "Macbook Pro",
         code: '#0001',
         type: 'Laptop',
-        price: 1.123,
+        total_price: 1.123,
         price_currency: '$',
-        quantity: 23
+        quantity: 23,
+        invoice:{}
     }
 ]
 export default function SalesList() {
@@ -58,7 +63,7 @@ export default function SalesList() {
     return (
         <Box marginTop={'2rem'}>
             <Typography color={'grey.400'} variant="mdSemibold" pb={'1rem'}>
-                Product List
+                Sales List
             </Typography>
             <TableContainer>
                 <Table>
@@ -82,7 +87,7 @@ export default function SalesList() {
                             <TableCell sx={{ minWidth: '110px' }}>
                                 <Typography variant="xsSemibold" color={'grey.400'}
                                     textAlign={'right'}>
-                                    Price
+                                    Total Price
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{ minWidth: '110px' }}>
@@ -91,10 +96,16 @@ export default function SalesList() {
                                     Quantity
                                 </Typography>
                             </TableCell>
+                            <TableCell sx={{ minWidth: '110px' }}>
+                                <Typography variant="xsSemibold" color={'grey.400'}
+                                    textAlign={'right'}>
+                                    Invoice
+                                </Typography>
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {productList.map((product, index) => (
+                        {salesList.map((product, index) => (
                             <TableRow key={product.id}
                                 sx={{ backgroundColor: index % 2 === 0 ? 'grey.800' : 'unset' }}
                             >
@@ -115,12 +126,17 @@ export default function SalesList() {
                                 </TableCell>
                                 <TableCell>
                                     <Typography color={'grey.300'} variant="smRegular" textAlign={'right'}>
-                                        {`${product.price_currency} ${product.price}`}
+                                        {`${product.price_currency} ${product.total_price}`}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
                                     <Typography color={'grey.300'} variant="smRegular" textAlign={'right'}>
                                         {product.quantity}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography color={'grey.300'} variant="smRegular" textAlign={'right'}>
+                                        View Invoice
                                     </Typography>
                                 </TableCell>
                             </TableRow>

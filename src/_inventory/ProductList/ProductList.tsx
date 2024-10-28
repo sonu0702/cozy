@@ -6,9 +6,9 @@ import {
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { useState } from "react";
 
-const productList = [
+export const productList = [
     {
-        id: 1,
+        id: '1',
         name: "Macbook Pro",
         code: '#0001',
         type: 'Laptop',
@@ -17,7 +17,7 @@ const productList = [
         quantity: 23
     },
     {
-        id: 2,
+        id: '2',
         name: "Macbook Pro",
         code: '#0001',
         type: 'Laptop',
@@ -26,7 +26,7 @@ const productList = [
         quantity: 23
     },
     {
-        id: 3,
+        id: '3',
         name: "Macbook Pro",
         code: '#0001',
         type: 'Laptop',
@@ -35,7 +35,7 @@ const productList = [
         quantity: 23
     },
     {
-        id: 4,
+        id: '4',
         name: "Macbook Pro",
         code: '#0001',
         type: 'Laptop',
@@ -44,7 +44,7 @@ const productList = [
         quantity: 23
     },
     {
-        id: 5,
+        id: '5',
         name: "Macbook Pro",
         code: '#0001',
         type: 'Laptop',

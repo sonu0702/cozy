@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ProductFormData } from "./type";
+import { productList } from "../ProductList/ProductList";
 
 const api = axios.create({
     baseURL: "/api", // Adjust based on your API URL
@@ -33,3 +34,7 @@ export const getProductTypes = async (searchQuery?: string): Promise<ProductType
     }
     ]
 };
+
+export const getProducts = async (searchQuery?: string) => {
+    return productList
+}
