@@ -53,7 +53,7 @@ const productList = [
         quantity: 23
     }
 ]
-export default function ProductList() {
+export default function SalesList() {
     const [pageNumber, setPageNumber] = useState(2);
     return (
         <Box marginTop={'2rem'}>
