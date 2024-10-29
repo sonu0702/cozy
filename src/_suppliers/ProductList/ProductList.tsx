@@ -5,45 +5,50 @@ import {
 } from "@mui/material";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { useState } from "react";
+import { editSupplier } from "../EditSupplierForm/supplier_api";
 
 const suppliersList = [
     {
-        id: 1,
+        id: "1",
         name: "John Doer",
         email: "john@house.com",
         contact: "+1 232 234",
         address: "NC caroline, 123780, USA"
     },
     {
-        id: 2,
+        id: "2",
         name: "John Doer",
         email: "john@house.com",
         contact: "+1 232 234",
         address: "NC caroline, 123780, USA"
     },
     {
-        id: 3,
+        id: "3",
         name: "John Doer",
         email: "john@house.com",
         contact: "+1 232 234",
         address: "NC caroline, 123780, USA"
     },
     {
-        id: 4,
+        id: "4",
         name: "John Doer",
         email: "john@house.com",
         contact: "+1 232 234",
         address: "NC caroline, 123780, USA"
     },
     {
-        id: 5,
+        id: "5",
         name: "John Doer",
         email: "john@house.com",
         contact: "+1 232 234",
         address: "NC caroline, 123780, USA"
     }
 ]
-export default function SuppliersList() {
+
+export type SupplierListProps = {
+    onEditClick: (existingSupplier:any ) => void
+}
+export default function SuppliersList({onEditClick}: SupplierListProps) {
     const [pageNumber, setPageNumber] = useState(2);
     return (
         <Box marginTop={'2rem'}>
@@ -75,6 +80,12 @@ export default function SuppliersList() {
                                     Address
                                 </Typography>
                             </TableCell>
+                            <TableCell sx={{ minWidth: '110px' }}>
+                                <Typography variant="xsSemibold" color={'grey.400'}
+                                    textAlign={'right'}>
+                                    Actions
+                                </Typography>
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -100,6 +111,18 @@ export default function SuppliersList() {
                                 <TableCell>
                                     <Typography color={'grey.300'} variant="smRegular" textAlign={'right'}>
                                         {product.address}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell sx={{ minWidth: '110px' }}>
+                                    <Typography variant="xsSemibold" color={'grey.400'}
+                                        textAlign={'right'}>
+                                        <Button
+                                            variant="text"
+                                            color="error"
+                                            onClick={() => onEditClick(product)}
+                                        >
+                                            Edit
+                                        </Button>
                                     </Typography>
                                 </TableCell>
                             </TableRow>
