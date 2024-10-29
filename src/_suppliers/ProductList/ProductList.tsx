@@ -6,59 +6,49 @@ import {
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { useState } from "react";
 
-const productList = [
+const suppliersList = [
     {
         id: 1,
-        name: "Macbook Pro",
-        code: '#0001',
-        type: 'Laptop',
-        price: 1.123,
-        price_currency: '$',
-        quantity: 23
+        name: "John Doer",
+        email: "john@house.com",
+        contact: "+1 232 234",
+        address: "NC caroline, 123780, USA"
     },
     {
         id: 2,
-        name: "Macbook Pro",
-        code: '#0001',
-        type: 'Laptop',
-        price: 1.123,
-        price_currency: '$',
-        quantity: 23
+        name: "John Doer",
+        email: "john@house.com",
+        contact: "+1 232 234",
+        address: "NC caroline, 123780, USA"
     },
     {
         id: 3,
-        name: "Macbook Pro",
-        code: '#0001',
-        type: 'Laptop',
-        price: 1.123,
-        price_currency: '$',
-        quantity: 23
+        name: "John Doer",
+        email: "john@house.com",
+        contact: "+1 232 234",
+        address: "NC caroline, 123780, USA"
     },
     {
         id: 4,
-        name: "Macbook Pro",
-        code: '#0001',
-        type: 'Laptop',
-        price: 1.123,
-        price_currency: '$',
-        quantity: 23
+        name: "John Doer",
+        email: "john@house.com",
+        contact: "+1 232 234",
+        address: "NC caroline, 123780, USA"
     },
     {
         id: 5,
-        name: "Macbook Pro",
-        code: '#0001',
-        type: 'Laptop',
-        price: 1.123,
-        price_currency: '$',
-        quantity: 23
+        name: "John Doer",
+        email: "john@house.com",
+        contact: "+1 232 234",
+        address: "NC caroline, 123780, USA"
     }
 ]
-export default function ProductList() {
+export default function SuppliersList() {
     const [pageNumber, setPageNumber] = useState(2);
     return (
         <Box marginTop={'2rem'}>
             <Typography color={'grey.400'} variant="mdSemibold" pb={'1rem'}>
-                Product List
+                Suppliers List
             </Typography>
             <TableContainer>
                 <Table>
@@ -71,30 +61,24 @@ export default function ProductList() {
                             </TableCell>
                             <TableCell sx={{ minWidth: '125px' }}>
                                 <Typography variant="xsSemibold" color={'grey.400'}>
-                                    Code
+                                    Email
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{ minWidth: '125px' }}>
                                 <Typography variant="xsSemibold" color={'grey.400'}>
-                                    Type
+                                    Contact
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{ minWidth: '110px' }}>
                                 <Typography variant="xsSemibold" color={'grey.400'}
                                     textAlign={'right'}>
-                                    Price
-                                </Typography>
-                            </TableCell>
-                            <TableCell sx={{ minWidth: '110px' }}>
-                                <Typography variant="xsSemibold" color={'grey.400'}
-                                    textAlign={'right'}>
-                                    Quantity
+                                    Address
                                 </Typography>
                             </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {productList.map((product, index) => (
+                        {suppliersList.map((product, index) => (
                             <TableRow key={product.id}
                                 sx={{ backgroundColor: index % 2 === 0 ? 'grey.800' : 'unset' }}
                             >
@@ -105,22 +89,17 @@ export default function ProductList() {
                                 </TableCell>
                                 <TableCell>
                                     <Typography color={'grey.300'} variant="smRegular">
-                                        {product.code}
+                                        {product.email}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
                                     <Typography color={'grey.300'} variant="smRegular">
-                                        {product.type}
+                                        {product.contact}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
                                     <Typography color={'grey.300'} variant="smRegular" textAlign={'right'}>
-                                        {`${product.price_currency} ${product.price}`}
-                                    </Typography>
-                                </TableCell>
-                                <TableCell>
-                                    <Typography color={'grey.300'} variant="smRegular" textAlign={'right'}>
-                                        {product.quantity}
+                                        {product.address}
                                     </Typography>
                                 </TableCell>
                             </TableRow>

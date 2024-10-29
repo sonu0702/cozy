@@ -3,7 +3,11 @@ import { IconTruck } from "@tabler/icons-react";
 // import SearchBar from "../SearchBar/SearchBar";
 import { Suspense } from "react";
 
-export default function TopNavBar() {
+interface TopNavBarProps {
+  onAddClick: () => void;
+}
+
+export default function TopNavBar({onAddClick} : TopNavBarProps) {
   return (
     <Stack
       gap={3}
@@ -20,13 +24,12 @@ export default function TopNavBar() {
       </Suspense> */}
       <Button
         fullWidth
-        href={"https://x.com"}
         variant="darkContained"
-        target="_blank"
+        onClick={onAddClick}
         startIcon={<IconTruck size={16} />}
         style={{ justifyContent: "flex-start" }}
       >
-        Edit Suppliers
+        Add Suppliers
       </Button>
     </Stack>
   );
