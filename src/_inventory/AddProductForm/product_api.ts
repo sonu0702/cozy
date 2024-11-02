@@ -8,9 +8,13 @@ const api = axios.create({
 
 export const addProduct = async (data: ProductFormData) => {
     //   const response = await api.post("/products", data);
+    console.log("addProduct-data",data);
     return {};
 };
 
+export const editProduct = async (data: ProductFormData, id:string) => {
+    return {};
+}
 export interface ProductType {
     id: string;
     name: string;

@@ -11,7 +11,10 @@ export const productList = [
         id: '1',
         name: "Macbook Pro",
         code: '#0001',
-        type: 'Laptop',
+        type: {
+            id: '1',
+            name: "Laptop"
+        },
         price: 1.123,
         price_currency: '$',
         quantity: 23
@@ -20,7 +23,10 @@ export const productList = [
         id: '2',
         name: "Macbook Pro",
         code: '#0001',
-        type: 'Laptop',
+        type: {
+            id: '1',
+            name: "Laptop"
+        },
         price: 1.123,
         price_currency: '$',
         quantity: 23
@@ -29,7 +35,10 @@ export const productList = [
         id: '3',
         name: "Macbook Pro",
         code: '#0001',
-        type: 'Laptop',
+        type: {
+            id: '1',
+            name: "Laptop"
+        },
         price: 1.123,
         price_currency: '$',
         quantity: 23
@@ -38,7 +47,10 @@ export const productList = [
         id: '4',
         name: "Macbook Pro",
         code: '#0001',
-        type: 'Laptop',
+        type: {
+            id: '1',
+            name: "Laptop"
+        },
         price: 1.123,
         price_currency: '$',
         quantity: 23
@@ -47,13 +59,21 @@ export const productList = [
         id: '5',
         name: "Macbook Pro",
         code: '#0001',
-        type: 'Laptop',
+        type: {
+            id: '1',
+            name: "Laptop"
+        },
         price: 1.123,
         price_currency: '$',
         quantity: 23
     }
 ]
-export default function ProductList() {
+
+export type SupplierListProps = {
+    onEditClick: (existingSupplier:any ) => void
+}
+
+export default function ProductList({onEditClick }:SupplierListProps ) {
     const [pageNumber, setPageNumber] = useState(2);
     return (
         <Box marginTop={'2rem'}>
@@ -110,7 +130,7 @@ export default function ProductList() {
                                 </TableCell>
                                 <TableCell>
                                     <Typography color={'grey.300'} variant="smRegular">
-                                        {product.type}
+                                        {product.type.name}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
@@ -121,6 +141,18 @@ export default function ProductList() {
                                 <TableCell>
                                     <Typography color={'grey.300'} variant="smRegular" textAlign={'right'}>
                                         {product.quantity}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell sx={{ minWidth: '110px' }}>
+                                    <Typography variant="xsSemibold" color={'grey.400'}
+                                        textAlign={'right'}>
+                                        <Button
+                                            variant="text"
+                                            color="error"
+                                            onClick={() => onEditClick(product)}
+                                        >
+                                            Edit
+                                        </Button>
                                     </Typography>
                                 </TableCell>
                             </TableRow>

@@ -9,52 +9,47 @@ import { useState } from "react";
 const salesList = [
     {
         id: 1,
-        name: "Macbook Pro",
+        name: "John Doe",
         code: '#0001',
-        type: 'Laptop',
         total_price: 1.123,
-        price_currency: '$',
-        quantity: 23,
+        price_currency:'$',
+        create_at: '2024-11-02T07:14:35.039Z',
         invoice:{}
     },
     {
         id: 2,
-        name: "Macbook Pro",
+        name: "John Doe",
         code: '#0001',
-        type: 'Laptop',
         total_price: 1.123,
-        price_currency: '$',
-        quantity: 23,
+        price_currency:'$',
+        create_at: '2024-11-02T07:14:35.039Z',
         invoice:{}
     },
     {
         id: 3,
-        name: "Macbook Pro",
+        name: "John Doe",
         code: '#0001',
-        type: 'Laptop',
         total_price: 1.123,
-        price_currency: '$',
-        quantity: 23,
+        price_currency:'$',
+        create_at: '2024-11-02T07:14:35.039Z',
         invoice:{}
     },
     {
         id: 4,
-        name: "Macbook Pro",
+        name: "John Doe",
         code: '#0001',
-        type: 'Laptop',
         total_price: 1.123,
-        price_currency: '$',
-        quantity: 23,
+        price_currency:'$',
+        create_at: '2024-11-02T07:14:35.039Z',
         invoice:{}
     },
     {
         id: 5,
-        name: "Macbook Pro",
+        name: "John Doe",
         code: '#0001',
-        type: 'Laptop',
         total_price: 1.123,
-        price_currency: '$',
-        quantity: 23,
+        price_currency:'$',
+        create_at: '2024-11-02T07:14:35.039Z',
         invoice:{}
     }
 ]
@@ -79,11 +74,6 @@ export default function SalesList() {
                                     Code
                                 </Typography>
                             </TableCell>
-                            <TableCell sx={{ minWidth: '125px' }}>
-                                <Typography variant="xsSemibold" color={'grey.400'}>
-                                    Type
-                                </Typography>
-                            </TableCell>
                             <TableCell sx={{ minWidth: '110px' }}>
                                 <Typography variant="xsSemibold" color={'grey.400'}
                                     textAlign={'right'}>
@@ -92,8 +82,8 @@ export default function SalesList() {
                             </TableCell>
                             <TableCell sx={{ minWidth: '110px' }}>
                                 <Typography variant="xsSemibold" color={'grey.400'}
-                                    textAlign={'right'}>
-                                    Quantity
+                                    textAlign={'center'}>
+                                    Date
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{ minWidth: '110px' }}>
@@ -120,23 +110,25 @@ export default function SalesList() {
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
-                                    <Typography color={'grey.300'} variant="smRegular">
-                                        {product.type}
-                                    </Typography>
-                                </TableCell>
-                                <TableCell>
                                     <Typography color={'grey.300'} variant="smRegular" textAlign={'right'}>
                                         {`${product.price_currency} ${product.total_price}`}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
-                                    <Typography color={'grey.300'} variant="smRegular" textAlign={'right'}>
-                                        {product.quantity}
+                                    <Typography color={'grey.300'} variant="smRegular" textAlign={'center'}>
+                                        {new Date(product.create_at).toDateString()}
                                     </Typography>
                                 </TableCell>
-                                <TableCell>
-                                    <Typography color={'grey.300'} variant="smRegular" textAlign={'right'}>
-                                        View Invoice
+                                <TableCell sx={{ minWidth: '110px' }}>
+                                    <Typography variant="xsSemibold" color={'grey.400'}
+                                        textAlign={'right'}>
+                                        <Button
+                                            variant="text"
+                                            color="error"
+                                            // onClick={() => onEditClick(product)}
+                                        >
+                                            View Invoice
+                                        </Button>
                                     </Typography>
                                 </TableCell>
                             </TableRow>

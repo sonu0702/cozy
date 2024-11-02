@@ -50,7 +50,7 @@ export default function AddProductForm({ open, onClose }: AddProductFormProps) {
     defaultValues: {
       name: "",
       code: "#",
-      type: "",
+      type: {},
       price: 0,
       quantity: 0,
     },
@@ -128,17 +128,16 @@ export default function AddProductForm({ open, onClose }: AddProductFormProps) {
                   getOptionLabel={(option) =>
                     typeof option === 'string' ? option : option.name
                   }
-                  isOptionEqualToValue={(option, value) =>
-                    typeof value === 'string'
-                      ? option.name === value
-                      : option.id === value.id
-                  }
+                  isOptionEqualToValue={(option, value) =>{
+                    if (!option || !value) return false;
+                    return option.id === value.id || option.name === value.name;
+                  }}
                   loading={isLoadingTypes}
                   onInputChange={(_, newValue) => {
                     handleSearchChange(newValue);
                   }}
                   onChange={(_, newValue) => {
-                    onChange(newValue ? newValue.name : '');
+                    onChange(newValue || null);
                   }}
                   renderInput={(params) => (
                     <TextField
