@@ -9,7 +9,9 @@ import Nav from "@/_homePage/Nav/nav";
 import QuickActions from "@/_homePage/QuickActions/QuickActions";
 import { Suspense } from "react";
 // import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import QueryProvider from './query-provider';
+import QueryProvider from '../_global/components/query-provider';
+import { AuthProvider } from '../_global/components/context/AuthContext';
+import ClientLayout from "@/_global/components/ClientLayout";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,52 +36,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body style={{ margin: 0, height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <ThemeRegistry
           platformTheme={CozyTheme}
           fontName={"'Inter', sans-serif"}
         >
-          <Suspense fallback={<div>Loading...</div>}>
-            <NavBar>
-              <Box component={'main'}
-                display="grid"
-                gridTemplateColumns={{
-                  xs: '100%',
-                  lg: 'minmax(315px, 360px) minmax(500px, 1200px) minmax(315px, 360px)',
-                }}
-                gap={{ xs: '1rem', lg: '0' }}
-              >
-                <Box
-                  paddingLeft={'2rem'}
-                  paddingTop={'2rem'}>
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <Nav />
-                  </Suspense>
-                </Box>
-                <Box display={'grid'}
-                  gridTemplateColumns={'100%'}
-                  gridTemplateRows={'auto'}
-                  borderLeft={'1px solid'}
-                  borderRight={'1px solid'}
-                  borderColor={'grey.800'}
-                  pb={{ xs: '0', md: '12px' }}
-                  paddingTop={'2rem'}
-                  paddingLeft={'2rem'}
-                  paddingRight={'2rem'}
-                >
-                  <QueryProvider>
-                    {children}
-                  </QueryProvider>
-                </Box>
-                <Box
-                  paddingTop={'2rem'}
-                  paddingLeft={'2rem'}>
-                  <QuickActions />
-                  <Divider sx={{ my: '1rem' }} />
-                </Box>
-              </Box>
-            </NavBar>
-          </Suspense>
+          <AuthProvider>
+            <Suspense fallback={<div>Loading...</div>}>
+              <ClientLayout>
+                {children}
+              </ClientLayout>
+            </Suspense>
+          </AuthProvider>
         </ThemeRegistry>
       </body>
     </html>
