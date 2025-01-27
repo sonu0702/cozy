@@ -17,7 +17,12 @@ const Login = () => {
         try {
             // Simulate API call with timeout
             await new Promise(resolve => setTimeout(resolve, 1500));
-            login();
+            // Call login with user data
+            console.log(email)
+            login({
+                name: email.split('@')[0], // Simple name from email
+                email: email
+            });
             router.push('/');
         } catch (error) {
             console.error('Login failed:', error);

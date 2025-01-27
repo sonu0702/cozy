@@ -11,14 +11,19 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Modal,
+  Box,
+  TextField,
 } from '@mui/material';
 import Link from 'next/link';
-//   import NavMenu from './NavMenu';
-//   import { useAppSelector } from '@/_global/hooks/useAppSelector';
 import { useCallback, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import HomeLink from './HomeLink';
 import { Controller, useForm } from 'react-hook-form';
+import { useAuth } from '../../../_global/components/context/AuthContext';
+//   import NavMenu from './NavMenu';
+//   import { useAppSelector } from '@/_global/hooks/useAppSelector';
+
 //   import HomeLink from './HomeLink';
 //   import { track } from '@amplitude/analytics-browser';
 //   import QBEBalance from './QBEBalance';
@@ -27,17 +32,35 @@ import { Controller, useForm } from 'react-hook-form';
 
 
 interface FormData {
-  paymentMethod: string;
+  selectedShopId: string;
+}
+
+interface CreateShopFormData {
+  name: string;
+}
+
+interface Shop {
+  id: string;
+  name: string;
+}
+
+interface User {
+  name?: string;
 }
 
 export default function TopNavBar() {
-    const { control, handleSubmit, reset, getValues, setValue } = useForm<FormData>({
-      defaultValues: {
-        paymentMethod: '',
-        
-      },
-    });
-  const isLoggedIn = true;
+  const { control, handleSubmit } = useForm<FormData>();
+  const { isAuthenticated, user, shops, activeShop, logout, updateDefaultShop, createShop } = useAuth() as {
+    isAuthenticated: boolean;
+    user: User;
+    shops: Shop[];
+    activeShop: Shop | null;
+    logout: () => void;
+    updateDefaultShop: (shopId: string) => void;
+    createShop: (name: string) => Promise<void>;
+  };
+  const [isCreateShopModalOpen, setIsCreateShopModalOpen] = useState(false);
+  const { control: createShopControl, handleSubmit: handleCreateShopSubmit, reset: resetCreateShopForm } = useForm<CreateShopFormData>();
   // const { isLoggedIn, profile } = useAppSelector((state) => state.userProfile);
   // const { skyrampServiceUrl, authServiceUrl, brandsAppServiceUrl } =
   //   useAppSelector((state) => state.global);
@@ -78,23 +101,37 @@ export default function TopNavBar() {
           justifyContent={'space-between'}
           alignItems={'center'}
         >
-          {isLoggedIn ? (
+          {isAuthenticated ? (
             <>
               <Controller
-                name="paymentMethod"
+                name="selectedShopId"
                 control={control}
+                defaultValue={activeShop?.id || ''}
                 render={({ field }) => (
                   <FormControl fullWidth>
-                    {/* <InputLabel>Payment Method</InputLabel> */}
-                    <Select {...field}>
-                      <MenuItem value="phonepe">PhonePe</MenuItem>
-                      <MenuItem value="creditCard">Credit Card</MenuItem>
-                      <MenuItem value="atmCard">ATM Card</MenuItem>
-                      <MenuItem value="other">Other</MenuItem>
+                    <Select
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        updateDefaultShop(e.target.value);
+                      }}
+                    >
+                      {shops.map((shop) => (
+                        <MenuItem key={shop.id} value={shop.id}>
+                          {shop.name}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 )}
               />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setIsCreateShopModalOpen(true)}
+              >
+                New Shop
+              </Button>
               <Button
                 color="inherit"
                 variant="text"
@@ -106,9 +143,54 @@ export default function TopNavBar() {
                 startIcon={<Avatar sx={{ width: 32, height: 32 }} />}
               >
                 <Typography variant="inherit" maxWidth={'16ch'} noWrap>
-                  {'Sonu'}
+                  {user?.name || 'User'}
                 </Typography>
               </Button>
+              <Modal
+                open={isCreateShopModalOpen}
+                onClose={() => setIsCreateShopModalOpen(false)}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Box
+                  sx={{
+                    bgcolor: 'background.paper',
+                    boxShadow: 24,
+                    p: 4,
+                    borderRadius: 1,
+                    minWidth: 300,
+                  }}
+                >
+                  <form onSubmit={handleCreateShopSubmit(async (data) => {
+                    await createShop(data.name);
+                    setIsCreateShopModalOpen(false);
+                    resetCreateShopForm();
+                  })}>
+                    <Stack spacing={2}>
+                      <Typography variant="h6">Create New Shop</Typography>
+                      <Controller
+                        name="name"
+                        control={createShopControl}
+                        defaultValue=""
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            label="Shop Name"
+                            fullWidth
+                            required
+                          />
+                        )}
+                      />
+                      <Button type="submit" variant="contained" color="primary">
+                        Create
+                      </Button>
+                    </Stack>
+                  </form>
+                </Box>
+              </Modal>
             </>
 
           ) : (
@@ -132,8 +214,11 @@ export default function TopNavBar() {
               horizontal: 'left',
             }}
           >
-            Nave menu
-            {/* <NavMenu onClose={handleCloseUserMenu} /> */}
+            <Stack sx={{ p: 2 }}>
+              <Button onClick={logout} fullWidth>
+                Logout
+              </Button>
+            </Stack>
           </StyledPopover>
         </Stack>
       </Stack>
