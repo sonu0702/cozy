@@ -90,13 +90,12 @@ function Nav() {
             <Typography color={'grey.50'} variant="mdBold">
                 Support
             </Typography>
-            <Box>
             <Button 
                 fullWidth
                 // href={'/reports'}
                 onClick={() => handleNavigation('/settings')}
                 variant={currentPath === '/settings' ? 'lightContained' : 'darkContained'}
-                target="_blank"
+                // target="_blank"
                 style={{ justifyContent: 'flex-start' }}
                 startIcon={<IconSettings size={16} />}
             >
@@ -112,7 +111,6 @@ function Nav() {
             >
                 Help
             </Button>
-            </Box>
 
         </Box>
     )
