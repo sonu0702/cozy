@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
-import { Button, Box, Stack, TextField, Typography, Divider } from '@mui/material';
+import { Button, Box, Stack, TextField, Typography, Divider, IconButton, Checkbox, FormControlLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import InvoiceModal from './InvoiceModal';
 import InvoiceTable from './InvoiceTable';
 
@@ -48,33 +53,74 @@ interface InvoiceForm {
     onClose: () => void;
 }
 
+const convertToWords = (amount: number): string => {
+    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+    const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+
+    const convertGroup = (n: number): string => {
+        if (n === 0) return '';
+        else if (n < 10) return ones[n];
+        else if (n < 20) return teens[n - 10];
+        else if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + ones[n % 10] : '');
+        else return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' ' + convertGroup(n % 100) : '');
+    };
+
+    const wholePart = Math.floor(amount);
+    const decimalPart = Math.round((amount - wholePart) * 100);
+
+    if (wholePart === 0 && decimalPart === 0) return 'Zero';
+
+    let result = '';
+    const crores = Math.floor(wholePart / 10000000);
+    const lakhs = Math.floor((wholePart % 10000000) / 100000);
+    const thousands = Math.floor((wholePart % 100000) / 1000);
+    const hundreds = wholePart % 1000;
+
+    if (crores > 0) result += convertGroup(crores) + ' Crore ';
+    if (lakhs > 0) result += convertGroup(lakhs) + ' Lakh ';
+    if (thousands > 0) result += convertGroup(thousands) + ' Thousand ';
+    if (hundreds > 0) result += convertGroup(hundreds);
+
+    result = result.trim();
+    if (decimalPart > 0) {
+        result += ' and ' + convertGroup(decimalPart) + ' Paise';
+    } else {
+        result += ' Rupees Only';
+    }
+
+    return result;
+};
+
 const InvoiceForm: React.FC<InvoiceForm> = ({ onClose }) => {
     const [items, setItems] = useState<InvoiceItem[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentItem, setCurrentItem] = useState<InvoiceItem | null>(null);
+    const [editMode, setEditMode] = useState(false);
+    const [copyBillToShip, setCopyBillToShip] = useState(false);
     const [invoiceDetails, setInvoiceDetails] = useState<InvoiceDetails>({
-        gstin: '29AAPCP2330Q1ZQ',
-        address: '2313, 2nd Floor, Saptaghiri Padmini, 15 th Main Road, 2nd Cross Hal 2nd Stage Bengaluru - 560008',
-        serialNo: '001/2024-25',
-        date: '20-01-2025',
-        panNo: 'AAPCP2330Q',
-        cinNo: 'U93290KA2024PTC195321',
+        gstin: 'GSTIN123456789',
+        address: '123 Business Park, Tech Hub, Bangalore',
+        serialNo: `INV-${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
+        date: new Date().toLocaleDateString('en-GB'),
+        panNo: 'PANABCD1234E',
+        cinNo: 'CIN123456789',
         state: 'Karnataka',
         stateCode: '29',
         billTo: {
-            name: 'Zscaler Softech India Private Limited',
-            address: '3, 63-159-8/2, Bren Optimus, Dr.M.H. Marigowda Road, Dairy Colony, Adugodi, Bengaluru - 560029',
-            state: 'Karnataka',
-            stateCode: '29',
-            gstin: '29AAICSO242G1ZD',
+            name: 'Client Name',
+            address: 'Client Address',
+            state: 'Client State',
+            stateCode: '00',
+            gstin: 'Client GSTIN'
         },
         shipTo: {
-            name: 'Zscaler Softech India Private Limited',
-            address: '3, 63-159-8/2, Bren Optimus, Dr.M.H. Marigowda Road, Dairy Colony, Adugodi, Bengaluru - 560029',
-            state: 'Karnataka',
-            stateCode: '29',
-            gstin: '29AAICSO242G1ZD',
-        },
+            name: 'Client Name',
+            address: 'Client Address',
+            state: 'Client State',
+            stateCode: '00',
+            gstin: 'Client GSTIN'
+        }
     });
 
     const addItem = (item: InvoiceItem) => {
@@ -110,74 +156,343 @@ const InvoiceForm: React.FC<InvoiceForm> = ({ onClose }) => {
     const totalIgstAmount = items.reduce((total, item) => total + item.igstAmount, 0);
     const totalAmount = totalTaxableValue + totalCgstAmount + totalSgstAmount + totalIgstAmount;
 
+    const handleBillToShipChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCopyBillToShip(event.target.checked);
+        if (event.target.checked) {
+            setInvoiceDetails(prev => ({
+                ...prev,
+                shipTo: { ...prev.billTo }
+            }));
+        }
+    };
+
+    const handleDateChange = (newDate: Date | null) => {
+        if (newDate) {
+            setInvoiceDetails(prev => ({
+                ...prev,
+                date: newDate.toLocaleDateString('en-GB')
+            }));
+        }
+    };
+
+    const handleInvoiceDetailsChange = (field: string, value: string) => {
+        setInvoiceDetails(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleBillToChange = (field: string, value: string) => {
+        setInvoiceDetails(prev => ({
+            ...prev,
+            billTo: {
+                ...prev.billTo,
+                [field]: value
+            }
+        }));
+    };
+
+    const handleShipToChange = (field: string, value: string) => {
+        setInvoiceDetails(prev => ({
+            ...prev,
+            shipTo: {
+                ...prev.shipTo,
+                [field]: value
+            }
+        }));
+    };
+
     return (
-        <Box p={2} sx={{ fontSize: '0.7rem' }}>
-            <Typography variant="h6" gutterBottom sx={{ fontSize: '0.8rem' }}>
-                Invoice Form
-            </Typography>
-            <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => onClose()} sx={{ mb: 2, fontSize: '0.6rem' }}>
-                Close
-            </Button>
-            <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => openModal()} sx={{ mb: 2, fontSize: '0.6rem' }}>
-                Add Item
-            </Button>
+        <Box p={2} sx={{ fontSize: '0.7rem', position: 'relative' }}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                <Box display="flex" alignItems="center" gap={2}>
+                    <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 600 }}>
+                        Invoice Form
+                    </Typography>
+                    <IconButton onClick={() => setEditMode(!editMode)} size="small" sx={{ ml: 1 }}>
+                        {editMode ? <CloseIcon /> : <EditIcon />}
+                    </IconButton>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<AddIcon />}
+                        onClick={() => openModal()}
+                        sx={{ fontSize: '0.6rem' }}
+                    >
+                        Add Item
+                    </Button>
+                </Box>
+                <IconButton onClick={onClose} size="small">
+                    <CloseIcon />
+                </IconButton>
+            </Box>
+
             <Box mt={2}>
                 <form onSubmit={handleSubmit}>
                     <Stack spacing={1}>
-                        <Box display="flex" justifyContent="space-between">
-                            <TextField label="GSTIN" value={invoiceDetails.gstin} sx={{ flex: 1, mr: 1, fontSize: '0.2rem' }} />
-                            <TextField label="PAN No" value={invoiceDetails.panNo} sx={{ flex: 1, ml: 1, fontSize: '0.2rem' }} />
-                        </Box>
-                        <TextField label="Address" value={invoiceDetails.address} fullWidth multiline rows={3} sx={{ fontSize: '0.6rem' }} />
-                        <Box display="flex" justifyContent="space-between">
-                            <TextField label="Serial No. of Invoice" value={invoiceDetails.serialNo} sx={{ flex: 1, mr: 1, fontSize: '0.6rem' }} />
-                            <TextField label="Date" value={invoiceDetails.date} sx={{ flex: 1, ml: 1, fontSize: '0.6rem' }} />
-                        </Box>
-                        <Box display="flex" justifyContent="space-between">
-
-                            {/* <Box display="flex" flexDirection="column"> */}
-                            <TextField label="CIN No" value={invoiceDetails.cinNo} sx={{ flex: 1, mr: 1, fontSize: '0.6rem' }} />
-                            <TextField label="State" value={invoiceDetails.state} sx={{ mb: 1, fontSize: '0.6rem' }} />
-                            <TextField label="State Code" value={invoiceDetails.stateCode} sx={{ fontSize: '0.6rem' }} />
-                            {/* </Box> */}
-                        </Box>
-                        <Divider />
-                        <Typography variant="body1" sx={{ fontSize: '0.7rem' }}>Bill To:</Typography>
-                        <TextField label="Name" value={invoiceDetails.billTo.name} fullWidth sx={{ fontSize: '0.6rem' }} />
-                        <TextField label="Address" value={invoiceDetails.billTo.address} fullWidth multiline rows={3} sx={{ fontSize: '0.6rem' }} />
-                        <Box display="flex" justifyContent="space-between">
-                            <TextField label="State" value={invoiceDetails.billTo.state} sx={{ flex: 1, mr: 1, fontSize: '0.6rem' }} />
-                            <TextField label="State Code" value={invoiceDetails.billTo.stateCode} sx={{ flex: 1, ml: 1, fontSize: '0.6rem' }} />
-                        </Box>
-                        <TextField label="GSTIN" value={invoiceDetails.billTo.gstin} fullWidth sx={{ fontSize: '0.6rem' }} />
-                        <Divider />
-                        <Typography variant="body1" sx={{ fontSize: '0.7rem' }}>Ship To:</Typography>
-                        <TextField label="Name" value={invoiceDetails.shipTo.name} fullWidth sx={{ fontSize: '0.6rem' }} />
-                        <TextField label="Address" value={invoiceDetails.shipTo.address} fullWidth multiline rows={3} sx={{ fontSize: '0.6rem' }} />
-                        <Box display="flex" justifyContent="space-between">
-                            <TextField label="State" value={invoiceDetails.shipTo.state} sx={{ flex: 1, mr: 1, fontSize: '0.6rem' }} />
-                            <TextField label="State Code" value={invoiceDetails.shipTo.stateCode} sx={{ flex: 1, ml: 1, fontSize: '0.6rem' }} />
-                        </Box>
-                        <TextField label="GSTIN" value={invoiceDetails.shipTo.gstin} fullWidth sx={{ fontSize: '0.6rem' }} />
-                        <Divider />
-                        <InvoiceTable items={items} onEdit={openModal} onDelete={deleteItem} />
-                        <Divider />
-                        <Box display="flex" justifyContent="space-between" mt={2}>
-                            <Typography variant="body1" sx={{ fontSize: '0.7rem' }}>Total:</Typography>
-                            <Box>
-                                <Typography sx={{ fontSize: '0.6rem' }}>Taxable Value: {totalTaxableValue.toFixed(2)}</Typography>
-                                <Typography sx={{ fontSize: '0.6rem' }}>CGST Amount: {totalCgstAmount.toFixed(2)}</Typography>
-                                <Typography sx={{ fontSize: '0.6rem' }}>SGST Amount: {totalSgstAmount.toFixed(2)}</Typography>
-                                <Typography sx={{ fontSize: '0.6rem' }}>IGST Amount: {totalIgstAmount.toFixed(2)}</Typography>
-                                <Typography variant="body1" sx={{ fontSize: '0.7rem' }}>Total Amount: {totalAmount.toFixed(2)}</Typography>
+                        <Box display="flex" gap={2} alignItems="flex-start">
+                            <Box flex={1}>
+                                <Stack spacing={1}>
+                                    <Box display="flex" gap={2} alignItems="center">
+                                        {editMode ? (
+                                            <TextField
+                                                label="Invoice No"
+                                                value={invoiceDetails.serialNo}
+                                                onChange={(e) => handleInvoiceDetailsChange('serialNo', e.target.value)}
+                                                size="small"
+                                                sx={{ flex: 1 }}
+                                            />
+                                        ) : (
+                                            <Typography sx={{ fontSize: '0.8rem' }}>
+                                                <strong>Invoice No:</strong> {invoiceDetails.serialNo}
+                                            </Typography>
+                                        )}
+                                        {editMode ? (
+                                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                <DatePicker
+                                                    label="Date"
+                                                    value={new Date(invoiceDetails.date)}
+                                                    onChange={handleDateChange}
+                                                    slotProps={{ textField: { size: 'small', sx: { flex: 1 } } }}
+                                                />
+                                            </LocalizationProvider>
+                                        ) : (
+                                            <Typography sx={{ fontSize: '0.8rem' }}>
+                                                <strong>Date:</strong> {invoiceDetails.date}
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                    <Box display="flex" gap={2} alignItems="center">
+                                        {editMode ? (
+                                            <>
+                                                <TextField
+                                                    label="PAN No"
+                                                    value={invoiceDetails.panNo}
+                                                    onChange={(e) => handleInvoiceDetailsChange('panNo', e.target.value)}
+                                                    size="small"
+                                                    sx={{ flex: 1 }}
+                                                />
+                                                <TextField
+                                                    label="GSTIN"
+                                                    value={invoiceDetails.gstin}
+                                                    onChange={(e) => handleInvoiceDetailsChange('gstin', e.target.value)}
+                                                    size="small"
+                                                    sx={{ flex: 1 }}
+                                                />
+                                            </>
+                                        ) : (
+                                            <Box display="flex" gap={2}>
+                                                <Typography sx={{ fontSize: '0.8rem' }}>
+                                                    <strong>PAN No:</strong> {invoiceDetails.panNo}
+                                                </Typography>
+                                                <Typography sx={{ fontSize: '0.8rem' }}>
+                                                    <strong>GSTIN:</strong> {invoiceDetails.gstin}
+                                                </Typography>
+                                            </Box>
+                                        )}
+                                    </Box>
+                                </Stack>
+                            </Box>
+                            <Box flex={1}>
+                                <Stack spacing={1}>
+                                    {editMode ? (
+                                        <TextField
+                                            label="Address"
+                                            value={invoiceDetails.address}
+                                            onChange={(e) => handleInvoiceDetailsChange('address', e.target.value)}
+                                            multiline
+                                            rows={2}
+                                            size="small"
+                                        />
+                                    ) : (
+                                        <Typography sx={{ fontSize: '0.8rem' }}>
+                                            <strong>Address:</strong> {invoiceDetails.address}
+                                        </Typography>
+                                    )}
+                                    <Box display="flex" gap={2} alignItems="center">
+                                        {editMode ? (
+                                            <>
+                                                <TextField
+                                                    label="State"
+                                                    value={invoiceDetails.state}
+                                                    onChange={(e) => handleInvoiceDetailsChange('state', e.target.value)}
+                                                    size="small"
+                                                    sx={{ flex: 1 }}
+                                                />
+                                                <TextField
+                                                    label="State Code"
+                                                    value={invoiceDetails.stateCode}
+                                                    onChange={(e) => handleInvoiceDetailsChange('stateCode', e.target.value)}
+                                                    size="small"
+                                                    sx={{ flex: 1 }}
+                                                />
+                                            </>
+                                        ) : (
+                                            <Box display="flex" gap={2}>
+                                                <Typography sx={{ fontSize: '0.8rem' }}>
+                                                    <strong>State:</strong> {invoiceDetails.state}
+                                                </Typography>
+                                                <Typography sx={{ fontSize: '0.8rem' }}>
+                                                    <strong>State Code:</strong> {invoiceDetails.stateCode}
+                                                </Typography>
+                                            </Box>
+                                        )}
+                                    </Box>
+                                </Stack>
                             </Box>
                         </Box>
+
+                        <Divider />
+
+                        <Box display="flex" gap={4}>
+                            <Box flex={1}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Bill To:</Typography>
+                                <Stack spacing={2}>
+                                    <TextField
+                                        label="Name"
+                                        value={invoiceDetails.billTo.name}
+                                        onChange={(e) => handleBillToChange('name', e.target.value)}
+                                        size="small"
+                                        fullWidth
+                                        sx={{ '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                    />
+                                    <TextField
+                                        label="Address"
+                                        value={invoiceDetails.billTo.address}
+                                        onChange={(e) => handleBillToChange('address', e.target.value)}
+                                        multiline
+                                        rows={3}
+                                        size="small"
+                                        fullWidth
+                                        sx={{ '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                    />
+                                    <Box display="flex" gap={2}>
+                                        <TextField
+                                            label="State"
+                                            value={invoiceDetails.billTo.state}
+                                            onChange={(e) => handleBillToChange('state', e.target.value)}
+                                            size="small"
+                                            sx={{ flex: 1, '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                        />
+                                        <TextField
+                                            label="State Code"
+                                            value={invoiceDetails.billTo.stateCode}
+                                            onChange={(e) => handleBillToChange('stateCode', e.target.value)}
+                                            size="small"
+                                            sx={{ flex: 1, '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                        />
+                                    </Box>
+                                    <TextField
+                                        label="GSTIN"
+                                        value={invoiceDetails.billTo.gstin}
+                                        onChange={(e) => handleBillToChange('gstin', e.target.value)}
+                                        size="small"
+                                        fullWidth
+                                        sx={{ '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                    />
+                                </Stack>
+                            </Box>
+                            <Box flex={1}>
+                                <Box display="flex" alignItems="center" gap={2} mb={1}>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Ship To:</Typography>
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                checked={copyBillToShip}
+                                                onChange={handleBillToShipChange}
+                                                size="small"
+                                            />
+                                        }
+                                        label="Same as Bill To"
+                                    />
+                                </Box>
+                                <Stack spacing={2}>
+                                    <TextField
+                                        label="Name"
+                                        value={invoiceDetails.shipTo.name}
+                                        onChange={(e) => handleShipToChange('name', e.target.value)}
+                                        size="small"
+                                        fullWidth
+                                        sx={{ '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                    />
+                                    <TextField
+                                        label="Address"
+                                        value={invoiceDetails.shipTo.address}
+                                        onChange={(e) => handleShipToChange('address', e.target.value)}
+                                        multiline
+                                        rows={3}
+                                        size="small"
+                                        fullWidth
+                                        sx={{ '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                    />
+                                    <Box display="flex" gap={2}>
+                                        <TextField
+                                            label="State"
+                                            value={invoiceDetails.shipTo.state}
+                                            onChange={(e) => handleShipToChange('state', e.target.value)}
+                                            size="small"
+                                            sx={{ flex: 1, '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                        />
+                                        <TextField
+                                            label="State Code"
+                                            value={invoiceDetails.shipTo.stateCode}
+                                            onChange={(e) => handleShipToChange('stateCode', e.target.value)}
+                                            size="small"
+                                            sx={{ flex: 1, '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                        />
+                                    </Box>
+                                    <TextField
+                                        label="GSTIN"
+                                        value={invoiceDetails.shipTo.gstin}
+                                        onChange={(e) => handleShipToChange('gstin', e.target.value)}
+                                        size="small"
+                                        fullWidth
+                                        sx={{ '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                    />
+                                </Stack>
+                            </Box>
+                        </Box>
+
+                        <Divider />
+                        <InvoiceTable items={items} onEdit={openModal} onDelete={deleteItem} />
+                        <Box display="flex" justifyContent="flex-end" mt={1}>
+                            <Box width="200px">
+                                <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>TOTAL</Typography>
+                                <Box display="flex" justifyContent="space-between">
+                                    <Typography sx={{ fontSize: '0.7rem' }}>{totalTaxableValue.toFixed(2)}</Typography>
+                                    <Typography sx={{ fontSize: '0.7rem' }}>{totalCgstAmount.toFixed(2)}</Typography>
+                                    <Typography sx={{ fontSize: '0.7rem' }}>{totalSgstAmount.toFixed(2)}</Typography>
+                                    <Typography sx={{ fontSize: '0.7rem' }}>NA</Typography>
+                                </Box>
+                            </Box>
+                        </Box>
+                        <Divider sx={{ my: 2 }} />
+
+                        <Box>
+                            <Typography sx={{ fontSize: '0.7rem', mb: 1 }}>Total Invoice Value (In figure): {totalAmount.toFixed(2)}</Typography>
+                            <Typography sx={{ fontSize: '0.7rem', mb: 2 }}>Total Invoice Value (In Words): {convertToWords(totalAmount)}</Typography>
+                        </Box>
+
+                        <Box>
+                            <Typography sx={{ fontSize: '0.7rem', mb: 1 }}>Declaration:</Typography>
+                            <Typography sx={{ fontSize: '0.7rem', mb: 2, fontStyle: 'italic' }}>Certified that the particulars given above are true and correct and checked under my supervision.</Typography>
+                        </Box>
+
+                        <Box display="flex" justifyContent="flex-end" mt={2}>
+                            <Box textAlign="center">
+                                <Typography sx={{ fontSize: '0.7rem', mb: 1 }}>For Pivora Experiential Communications Pvt Ltd</Typography>
+                                <Box sx={{ borderBottom: '1px solid black', width: '200px', mb: 1 }} />
+                                <Typography sx={{ fontSize: '0.7rem' }}>Signature of the Licencee or his authorised agent</Typography>
+                            </Box>
+                        </Box>
+
+                        <Button type="submit" variant="contained" color="primary" sx={{ mt: 2, fontSize: '0.6rem' }}>
+                            Submit Invoice
+                        </Button>
                     </Stack>
-                    <Button type="submit" variant="contained" color="primary" sx={{ mt: 2, fontSize: '0.6rem' }}>
-                        Submit Invoice
-                    </Button>
                 </form>
             </Box>
+
             {isModalOpen && (
                 <InvoiceModal
                     item={currentItem}
