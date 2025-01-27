@@ -90,7 +90,8 @@ function Nav() {
             <Typography color={'grey.50'} variant="mdBold">
                 Support
             </Typography>
-            <Button
+            <Box>
+            <Button 
                 fullWidth
                 // href={'/reports'}
                 onClick={() => handleNavigation('/settings')}
@@ -111,6 +112,7 @@ function Nav() {
             >
                 Help
             </Button>
+            </Box>
 
         </Box>
     )
