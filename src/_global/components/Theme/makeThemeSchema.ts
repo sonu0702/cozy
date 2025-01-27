@@ -13,8 +13,8 @@ export const makeThemeSchema = (
   fontName: string
 ): ThemeOptions => ({
   typography: {
-    fontSize: 16,
-    htmlFontSize: 16,
+    fontSize: 8,
+    htmlFontSize: 12,
     fontFamily: fontName,
     fontWeightBold: 700,
     fontWeightMedium: 500,

@@ -1,8 +1,9 @@
 "use client"
 import { Box, Button, Typography } from "@mui/material";
-import { IconBrandX , IconLayoutDashboard,IconPackage,IconShoppingCart,
+import {
+    IconBrandX, IconLayoutDashboard, IconPackage, IconShoppingCart,
     IconTruck, IconReportAnalytics, IconSettings, IconHeadset
- } from "@tabler/icons-react";
+} from "@tabler/icons-react";
 import { useRouter, usePathname } from "next/navigation";
 
 function Nav() {
@@ -91,13 +92,14 @@ function Nav() {
             </Typography>
             <Button
                 fullWidth
-                href={'https://x.com'}
-                variant="darkContained"
+                // href={'/reports'}
+                onClick={() => handleNavigation('/settings')}
+                variant={currentPath === '/settings' ? 'lightContained' : 'darkContained'}
                 target="_blank"
                 style={{ justifyContent: 'flex-start' }}
-                startIcon={<IconHeadset size={16} />}
+                startIcon={<IconSettings size={16} />}
             >
-                Help
+                Settings
             </Button>
             <Button
                 fullWidth
@@ -105,9 +107,9 @@ function Nav() {
                 variant="darkContained"
                 target="_blank"
                 style={{ justifyContent: 'flex-start' }}
-                startIcon={<IconSettings size={16} />}
+                startIcon={<IconHeadset size={16} />}  
             >
-                Settings
+                Help
             </Button>
 
         </Box>

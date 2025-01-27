@@ -35,7 +35,7 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
                                 display="grid"
                                 gridTemplateColumns={{
                                     xs: '100%',
-                                    lg: 'minmax(315px, 360px) minmax(500px, 1200px) minmax(315px, 360px)',
+                                    lg: 'minmax(315px, 360px) minmax(500px, 1200px)',
                                 }}
                                 gap={{ xs: '1rem', lg: '0' }}
                             >
@@ -61,12 +61,12 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
                                         {children}
                                     </QueryProvider>
                                 </Box>
-                                <Box
+                                {/* <Box
                                     paddingTop={'2rem'}
                                     paddingLeft={'2rem'}>
                                     <QuickActions />
                                     <Divider sx={{ my: '1rem' }} />
-                                </Box>
+                                </Box> */}
                             </Box>
                         </NavBar>
                     )}
