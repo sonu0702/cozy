@@ -8,6 +8,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import InvoiceModal from './InvoiceModal';
 import InvoiceTable from './InvoiceTable';
+import { useAuth } from '@/_global/components/context/AuthContext';
 
 interface InvoiceItem {
     description: string;
@@ -93,20 +94,21 @@ const convertToWords = (amount: number): string => {
 };
 
 const InvoiceForm: React.FC<InvoiceForm> = ({ onClose }) => {
+    const { user, activeShop } = useAuth();
     const [items, setItems] = useState<InvoiceItem[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentItem, setCurrentItem] = useState<InvoiceItem | null>(null);
     const [editMode, setEditMode] = useState(false);
     const [copyBillToShip, setCopyBillToShip] = useState(false);
-    const [invoiceDetails, setInvoiceDetails] = useState<InvoiceDetails>({
-        gstin: 'GSTIN123456789',
-        address: '123 Business Park, Tech Hub, Bangalore',
+    const [invoiceDetails, setInvoiceDetails] = useState<InvoiceDetails>(() => ({
+        gstin: activeShop?.gstin || 'GSTIN123456789',
+        address: activeShop?.address || '123 Business Park, Tech Hub, Bangalore',
         serialNo: `INV-${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
         date: new Date().toLocaleDateString('en-GB'),
-        panNo: 'PANABCD1234E',
+        panNo: activeShop?.pan || 'PANABCD1234E',
         cinNo: 'CIN123456789',
-        state: 'Karnataka',
-        stateCode: '29',
+        state: activeShop?.state || 'Karnataka',
+        stateCode: activeShop?.state_code || '29',
         billTo: {
             name: 'Client Name',
             address: 'Client Address',
@@ -121,7 +123,7 @@ const InvoiceForm: React.FC<InvoiceForm> = ({ onClose }) => {
             stateCode: '00',
             gstin: 'Client GSTIN'
         }
-    });
+    }));
 
     const addItem = (item: InvoiceItem) => {
         setItems([...items, item]);
@@ -346,7 +348,9 @@ const InvoiceForm: React.FC<InvoiceForm> = ({ onClose }) => {
 
                         <Box display="flex" gap={4}>
                             <Box flex={1}>
+                                <Box marginBottom={"12px"} marginTop={"8px"}>
                                 <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Bill To:</Typography>
+                                </Box>
                                 <Stack spacing={2}>
                                     <TextField
                                         label="Name"

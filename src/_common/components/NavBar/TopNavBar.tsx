@@ -111,9 +111,18 @@ export default function TopNavBar() {
                   <FormControl fullWidth>
                     <Select
                       {...field}
+                      value={activeShop?.id || ''}
                       onChange={(e) => {
                         field.onChange(e);
                         updateDefaultShop(e.target.value);
+                      }}
+                      displayEmpty
+                      sx={{
+                        minWidth: 200,
+                        color: 'white',
+                        '& .MuiSelect-select': {
+                          py: 1
+                        }
                       }}
                     >
                       {shops.map((shop) => (
@@ -126,13 +135,6 @@ export default function TopNavBar() {
                 )}
               />
               <Button
-                variant="contained"
-                color="primary"
-                onClick={() => setIsCreateShopModalOpen(true)}
-              >
-                New Shop
-              </Button>
-              <Button
                 color="inherit"
                 variant="text"
                 onClick={handleOpenUserMenu}
@@ -142,7 +144,7 @@ export default function TopNavBar() {
                 }}
                 startIcon={<Avatar sx={{ width: 32, height: 32 }} />}
               >
-                <Typography variant="inherit" maxWidth={'16ch'} noWrap>
+                <Typography variant="inherit" maxWidth={'16ch'} overflow={"unset"}noWrap>
                   {user?.name || 'User'}
                 </Typography>
               </Button>
@@ -214,8 +216,11 @@ export default function TopNavBar() {
               horizontal: 'left',
             }}
           >
-            <Stack sx={{ p: 2 }}>
-              <Button onClick={logout} fullWidth>
+            <Stack sx={{ p: 2 }} spacing={1}>
+              <Button onClick={() => setIsCreateShopModalOpen(true)} fullWidth variant="contained" color="primary">
+                New Shop
+              </Button>
+              <Button onClick={logout} fullWidth variant="outlined" color="inherit">
                 Logout
               </Button>
             </Stack>

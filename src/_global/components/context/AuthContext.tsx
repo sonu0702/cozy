@@ -3,9 +3,14 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface Shop {
-  name: string;
-  id: string;
-  is_default: boolean;
+  name?: string;
+  id?: string;
+  is_default?: boolean;
+  address?: string;
+  gstin?: string;
+  pan?: string;
+  state?: string;
+  state_code?: string;
 }
 
 interface User {
@@ -64,6 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       shops: shopList || [],
       activeShop: shopList ? (shopList.find(shop => shop.is_default) || shopList[0]) : null
     };
+    console.log('login', newAuthState);
     localStorage.setItem('auth', JSON.stringify(newAuthState));
     setIsAuthenticated(true);
     if (userData) setUser(userData);
