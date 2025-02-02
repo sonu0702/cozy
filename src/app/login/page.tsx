@@ -1,31 +1,36 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../_global/components/context/AuthContext';
-import { Button, TextField, Container, Typography, Box, Paper, CircularProgress,Divider } from '@mui/material';
+import { Button, TextField, Container, Typography, Box, Paper, CircularProgress, Divider } from '@mui/material';
+import Alert from '@/_common/components/Alert/Alert';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
     const { login } = useAuth();
     const router = useRouter();
 
     const handleLogin = async () => {
+        setError('');
+        if (!username || !password) {
+            setError('Username and password are required');
+            return;
+        }
+        if (username.length < 4) {
+            setError('Username must be at least 6 characters long');
+            return;
+        }
         setIsLoading(true);
         try {
-            // Simulate API call with timeout
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            // Call login with user data
-            console.log("login",email, "email.split('@')[0]",email.split('@')[0]);
-            login({
-                name: email.split('@')[0], // Simple name from email
-                email: email
-            }, [{id:"1",name:"Shop 1",is_default:true}]);
+            await login(username, password);
             router.push('/');
         } catch (error) {
             console.error('Login failed:', error);
+            setError('Invalid username or password. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -38,7 +43,15 @@ const Login = () => {
             alignItems: 'center',
             justifyContent: 'center'
         }}>
-            <Paper elevation={3} sx={{ p: 3, width: '100%' }}>
+            <Paper elevation={3} sx={{ p: 3, width: '100%', position: 'relative' }}>
+                {error && (
+                    <Alert 
+                        severity="error" 
+                        onClose={() => setError('')}
+                    >
+                        {error}
+                    </Alert>
+                )}
                 <Box sx={{ 
                     display: 'flex', 
                     flexDirection: 'column', 
@@ -57,12 +70,13 @@ const Login = () => {
                         Login
                     </Typography>
                     <TextField 
-                        label="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        label="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         fullWidth
                         size="small"
                         margin="dense"
+                        error={!!error}
                     />
                     <TextField 
                         label="Password"

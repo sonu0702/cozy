@@ -221,6 +221,13 @@ export const makeThemeSchema = (
  * @constant ComponentOverride - Object that overrides the default style of MUI components.
  */
 export const ComponentOverride: Components = {
+  MuiAlert: {
+    styleOverrides: {
+      root: {
+        transition: 'all 0.3s ease-in-out',
+      },
+    },
+  },
   MuiDrawer: {
     defaultProps: {
       anchor: 'right',

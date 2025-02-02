@@ -1,17 +1,10 @@
 // app/context/AuthContext.tsx
 "use client";
+import api, { listShops, setDefaultSop } from '@/_global/api/api';
+import { Shop, ShopsListResponse } from '@/_global/api/types';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import toast from 'react-hot-toast';
 
-interface Shop {
-  name?: string;
-  id?: string;
-  is_default?: boolean;
-  address?: string;
-  gstin?: string;
-  pan?: string;
-  state?: string;
-  state_code?: string;
-}
 
 interface User {
   name: string;
@@ -23,7 +16,8 @@ interface AuthContextType {
   user: User | null;
   shops: Shop[];
   activeShop: Shop | null;
-  login: (userData?: User, shopList?: Shop[]) => void;
+  login: (username:string,password:string) => void;
+  signup: (username:string,password:string,name:string) => Promise<void>;
   logout: () => void;
   setActiveShop: (shop: Shop) => void;
   createShop: (name: string) => Promise<void>;
@@ -62,23 +56,60 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return null;
   });
 
-  const login = (userData?: User, shopList?: Shop[]) => {
-    const newAuthState = {
-      isAuthenticated: true,
-      user: userData || null,
-      shops: shopList || [],
-      activeShop: shopList ? (shopList.find(shop => shop.is_default) || shopList[0]) : null
-    };
-    console.log('login', newAuthState);
-    localStorage.setItem('auth', JSON.stringify(newAuthState));
-    setIsAuthenticated(true);
-    if (userData) setUser(userData);
-    if (shopList) {
-      setShops(shopList);
-      const defaultShop = shopList.find(shop => shop.is_default) || shopList[0];
-      if (defaultShop) {
-        setActiveShop(defaultShop);
+  const login = async (username: string, password: string) => {
+    try {
+      const response = await api.post('/auth/login', { username, password });
+      const { user: userData, token, default_shop } = response.data.data;
+      
+      
+      const newAuthState = {
+        isAuthenticated: true,
+        user: userData,
+        token,
+        shops: [default_shop],
+        activeShop: default_shop
+      };
+      localStorage.setItem('auth', JSON.stringify(newAuthState));
+      setIsAuthenticated(true);
+      setUser(userData);
+      const allShops = await listShops()
+      setShops(allShops.data);
+      setActiveShop(default_shop);
+      toast.success('Successfully logged in!');
+    } catch (error: any) {
+      let errorMessage = 'An unexpected error occurred';
+      if (error.response?.status === 401) {
+        errorMessage = 'Invalid username or password';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
       }
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const updateDefaultShop = async (shopId: string) => {
+    try {
+      await setDefaultSop(shopId)
+      const updatedShops = shops.map(shop => ({
+        ...shop,
+        is_default: shop.id === shopId
+      }));
+      setShops(updatedShops);
+      const newActiveShop = updatedShops.find(shop => shop.id === shopId);
+      if (newActiveShop) {
+        setActiveShop(newActiveShop);
+        // Update localStorage with new shop state
+        const authData = JSON.parse(localStorage.getItem('auth') || '{}');
+        authData.shops = updatedShops;
+        authData.activeShop = newActiveShop;
+        localStorage.setItem('auth', JSON.stringify(authData));
+      }
+    } catch (error) {
+      console.error('Failed to update default shop:', error);
+      throw error;
     }
   };
 
@@ -88,24 +119,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
     setShops([]);
     setActiveShop(null);
-  };
-
-  const updateDefaultShop = async (shopId: string) => {
-    try {
-      // TODO: Make API call to update default shop
-      const updatedShops = shops.map(shop => ({
-        ...shop,
-        is_default: shop.id === shopId
-      }));
-      setShops(updatedShops);
-      const newActiveShop = updatedShops.find(shop => shop.id === shopId);
-      if (newActiveShop) {
-        setActiveShop(newActiveShop);
-      }
-    } catch (error) {
-      console.error('Failed to update default shop:', error);
-      throw error;
-    }
   };
 
   const createShop = async (name: string) => {
@@ -125,6 +138,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const signup = async (username: string, password: string, name: string) => {
+    try {
+      const response = await api.post('/auth/signup', { username, password, name });
+      // After successful signup, we don't automatically log in the user
+      // They will be redirected to the login page
+    } catch (error) {
+      console.error('Signup failed:', error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       isAuthenticated,
@@ -132,11 +156,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       shops,
       activeShop,
       login,
+      signup,
       logout,
       setActiveShop,
       createShop,
       updateDefaultShop
     }}>
+
       {children}
     </AuthContext.Provider>
   );

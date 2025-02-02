@@ -9,6 +9,8 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import InvoiceModal from './InvoiceModal';
 import InvoiceTable from './InvoiceTable';
 import { useAuth } from '@/_global/components/context/AuthContext';
+import { createInvoice } from '@/_global/api/api';
+import { CreateInvoiceRequest } from '@/_global/api/types';
 
 interface InvoiceItem {
     description: string;
@@ -106,7 +108,7 @@ const InvoiceForm: React.FC<InvoiceForm> = ({ onClose }) => {
         serialNo: `INV-${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
         date: new Date().toLocaleDateString('en-GB'),
         panNo: activeShop?.pan || 'PANABCD1234E',
-        cinNo: 'CIN123456789',
+        cinNo: activeShop?.cin || 'CIN123456789',
         state: activeShop?.state || 'Karnataka',
         stateCode: activeShop?.state_code || '29',
         billTo: {
@@ -146,10 +148,55 @@ const InvoiceForm: React.FC<InvoiceForm> = ({ onClose }) => {
         setIsModalOpen(true);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Handle form submission
-        console.log(items, invoiceDetails);
+        try {
+            const invoiceData: CreateInvoiceRequest = {
+                gstin: invoiceDetails.gstin,
+                address: invoiceDetails.address,
+                serialNo: invoiceDetails.serialNo,
+                date: invoiceDetails.date,
+                panNo: invoiceDetails.panNo,
+                cinNo: invoiceDetails.cinNo,
+                state: invoiceDetails.state,
+                stateCode: invoiceDetails.stateCode,
+                billTo: {
+                    name: invoiceDetails.billTo.name,
+                    address: invoiceDetails.billTo.address,
+                    state: invoiceDetails.billTo.state,
+                    stateCode: invoiceDetails.billTo.stateCode,
+                    gstin: invoiceDetails.billTo.gstin
+                },
+                shipTo: {
+                    name: invoiceDetails.shipTo.name,
+                    address: invoiceDetails.shipTo.address,
+                    state: invoiceDetails.shipTo.state,
+                    stateCode: invoiceDetails.shipTo.stateCode,
+                    gstin: invoiceDetails.shipTo.gstin
+                },
+                total: totalAmount,
+                items: items.map(item => ({
+                    description: item.description,
+                    hsnSacCode: item.hsnSacCode,
+                    quantity: item.quantity,
+                    unitValue: item.unitValue,
+                    discount: item.discount,
+                    taxableValue: item.taxableValue,
+                    cgstRate: item.cgstRate,
+                    cgstAmount: item.cgstAmount,
+                    sgstRate: item.sgstRate,
+                    sgstAmount: item.sgstAmount,
+                    igstRate: item.igstRate,
+                    igstAmount: item.igstAmount
+                }))
+            };
+            
+            await createInvoice(activeShop?.id as string, invoiceData);
+            onClose();
+        } catch (error) {
+            console.error('Failed to create invoice:', error);
+            // TODO: Add error handling UI
+        }
     };
 
     const totalTaxableValue = items.reduce((total, item) => total + item.taxableValue, 0);

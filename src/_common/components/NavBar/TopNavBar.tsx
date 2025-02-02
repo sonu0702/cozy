@@ -45,7 +45,7 @@ interface Shop {
 }
 
 interface User {
-  name?: string;
+  username?: string;
 }
 
 export default function TopNavBar() {
@@ -145,7 +145,7 @@ export default function TopNavBar() {
                 startIcon={<Avatar sx={{ width: 32, height: 32 }} />}
               >
                 <Typography variant="inherit" maxWidth={'16ch'} overflow={"unset"}noWrap>
-                  {user?.name || 'User'}
+                  {user?.username || 'User'}
                 </Typography>
               </Button>
               <Modal

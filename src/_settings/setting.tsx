@@ -5,9 +5,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import { useAuth } from '../_global/components/context/AuthContext';
 import { Alert } from '@mui/material';
+import { getShopDetails } from '@/_global/api/api';
 
 const SettingsPage: React.FC = () => {
   const { activeShop, setActiveShop } = useAuth();
+  console.log("activeShop",activeShop);
   const [companyName, setCompanyName] = useState(activeShop?.name || '');
   const [companyAddress, setCompanyAddress] = useState(activeShop?.address || '');
   const [gstinNumber, setGstinNumber] = useState(activeShop?.gstin || '');
@@ -19,13 +21,21 @@ const SettingsPage: React.FC = () => {
 
   useEffect(() => {
     if (activeShop) {
-      setCompanyName(activeShop.name || '');
-      setCompanyAddress(activeShop.address || '');
-      setGstinNumber(activeShop.gstin || '');
-      setPanNumber(activeShop.pan || '');
-      setState(activeShop.state || '');
-      setStateCode(activeShop.state_code || '');
+      // get shop details from db
+      getShopDetails(activeShop?.id as string)
+      .then((data) => {
+       setCompanyName(data?.data.name|| '');
+       setCompanyAddress(data?.data.address|| '');
+       setGstinNumber(data?.data.gstin || '') ;
+       setPanNumber(data?.data.pan || '');
+       setState(data?.data.state || '');
+       setStateCode(data?.data.state_code || '');
+      })
+      .catch((err) => {
+        console.error(err);
+      });
     }
+    
   }, [activeShop]);
 
   const handleEdit = () => {

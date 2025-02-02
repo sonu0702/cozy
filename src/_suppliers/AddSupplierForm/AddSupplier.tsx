@@ -19,12 +19,17 @@ import {
 
 } from "@mui/material";
 import { SupplierFormData, supplierSchema } from "./type";
-import { addSupplier } from "./supplier_api";
+import api from '@/_global/api/api';
 
 interface AddSupplierFormProps {
     open: boolean;
     onClose: () => void;
 }
+
+const addSupplier = async (data: SupplierFormData) => {
+    const response = await api.post('/suppliers', data);
+    return response.data;
+};
 
 export default function AddSupplierForm({ open, onClose }: AddSupplierFormProps) {
     const [error, setError] = useState<string | null>(null);
