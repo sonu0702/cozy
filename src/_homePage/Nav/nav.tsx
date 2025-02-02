@@ -41,7 +41,7 @@ function Nav() {
             >
                 Dashboard
             </Button>
-            <Button
+            {/* <Button
                 fullWidth
                 // href={'/inventory'}
                 onClick={() => handleNavigation('/inventory')}
@@ -52,7 +52,7 @@ function Nav() {
 
             >
                 Inventory
-            </Button>
+            </Button> */}
             <Button
                 fullWidth
                 // href={'/salesorder'}
@@ -64,7 +64,7 @@ function Nav() {
             >
                 Sales Orders
             </Button>
-            <Button
+            {/* <Button
                 fullWidth
                 // href={'/suppliers'}
                 onClick={() => handleNavigation('/suppliers')}
@@ -74,8 +74,8 @@ function Nav() {
                 startIcon={<IconTruck size={16} />}
             >
                 Suppliers
-            </Button>
-            <Button
+            </Button> */}
+            {/* <Button
                 fullWidth
                 // href={'/reports'}
                 onClick={() => handleNavigation('/reports')}
@@ -85,7 +85,7 @@ function Nav() {
                 startIcon={<IconReportAnalytics size={16} />}
             >
                 Reports
-            </Button>
+            </Button> */}
 
             <Typography color={'grey.50'} variant="mdBold">
                 Support

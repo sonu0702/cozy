@@ -59,13 +59,13 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ items, onEdit, onDelete }) 
               <TableCell>{item.description}</TableCell>
               <TableCell>{item.hsnSacCode}</TableCell>
               <TableCell>1</TableCell>
-              <TableCell sx={{ textAlign: 'right' }}>{item.taxableValue.toFixed(2)}</TableCell>
+              <TableCell sx={{ textAlign: 'right' }}>{Number(item.taxableValue).toFixed(2)}</TableCell>
               <TableCell sx={{ textAlign: 'center' }}>{item.cgstRate}%</TableCell>
-              <TableCell sx={{ textAlign: 'right' }}>{item.cgstAmount.toFixed(2)}</TableCell>
+              <TableCell sx={{ textAlign: 'right' }}>{Number(item.cgstAmount).toFixed(2)}</TableCell>
               <TableCell sx={{ textAlign: 'center' }}>{item.sgstRate}%</TableCell>
-              <TableCell sx={{ textAlign: 'right' }}>{item.sgstAmount.toFixed(2)}</TableCell>
+              <TableCell sx={{ textAlign: 'right' }}>{Number(item.sgstAmount).toFixed(2)}</TableCell>
               <TableCell sx={{ textAlign: 'center' }}>{item.igstRate}%</TableCell>
-              <TableCell sx={{ textAlign: 'right' }}>{item.igstAmount.toFixed(2)}</TableCell>
+              <TableCell sx={{ textAlign: 'right' }}>{Number(item.igstAmount).toFixed(2)}</TableCell>
               <TableCell>
                 <IconButton onClick={() => onEdit(item)} size="small">
                   <EditIcon fontSize="small" />
@@ -80,11 +80,11 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ items, onEdit, onDelete }) 
         <TableFooter>
           <TableRow>
             <TableCell colSpan={3} sx={{ fontWeight: 'bold' }}>TOTAL</TableCell>
-            <TableCell sx={{ textAlign: 'right' }}>{items.reduce((sum, item) => sum + item.taxableValue, 0).toFixed(2)}</TableCell>
+            <TableCell sx={{ textAlign: 'right' }}>{Number(items.reduce((sum, item) => sum + item.taxableValue, 0)).toFixed(2)}</TableCell>
             <TableCell></TableCell>
-            <TableCell sx={{ textAlign: 'right' }}>{items.reduce((sum, item) => sum + item.cgstAmount, 0).toFixed(2)}</TableCell>
+            <TableCell sx={{ textAlign: 'right' }}>{Number(items.reduce((sum, item) => sum + item.cgstAmount, 0)).toFixed(2)}</TableCell>
             <TableCell></TableCell>
-            <TableCell sx={{ textAlign: 'right' }}>{items.reduce((sum, item) => sum + item.sgstAmount, 0).toFixed(2)}</TableCell>
+            <TableCell sx={{ textAlign: 'right' }}>{Number(items.reduce((sum, item) => sum + item.sgstAmount, 0)).toFixed(2)}</TableCell>
             <TableCell>NA</TableCell>
             <TableCell sx={{ textAlign: 'right' }}>NA</TableCell>
             <TableCell></TableCell>

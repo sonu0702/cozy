@@ -1,60 +1,90 @@
 'use client';
 import {
     Box, Button, Pagination, PaginationItem, Table, TableBody, TableCell,
-    TableContainer, TableHead, TableRow, Typography
+    TableContainer, TableHead, TableRow, Typography, Menu, MenuItem
 } from "@mui/material";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { useState } from "react";
+import { useQuery } from '@tanstack/react-query';
+import { listInvoices, generatePdf } from '@/_global/api/api';
+import toast from 'react-hot-toast';
+import { useAuth } from '@/_global/components/context/AuthContext';
 
-const salesList = [
-    {
-        id: 1,
-        name: "John Doe",
-        code: '#0001',
-        total_price: 1.123,
-        price_currency:'$',
-        create_at: '2024-11-02T07:14:35.039Z',
-        invoice:{}
-    },
-    {
-        id: 2,
-        name: "John Doe",
-        code: '#0001',
-        total_price: 1.123,
-        price_currency:'$',
-        create_at: '2024-11-02T07:14:35.039Z',
-        invoice:{}
-    },
-    {
-        id: 3,
-        name: "John Doe",
-        code: '#0001',
-        total_price: 1.123,
-        price_currency:'$',
-        create_at: '2024-11-02T07:14:35.039Z',
-        invoice:{}
-    },
-    {
-        id: 4,
-        name: "John Doe",
-        code: '#0001',
-        total_price: 1.123,
-        price_currency:'$',
-        create_at: '2024-11-02T07:14:35.039Z',
-        invoice:{}
-    },
-    {
-        id: 5,
-        name: "John Doe",
-        code: '#0001',
-        total_price: 1.123,
-        price_currency:'$',
-        create_at: '2024-11-02T07:14:35.039Z',
-        invoice:{}
+interface TopNavBarProps {
+    onOpenForm: (invoiceId?: string) => void;
+  }
+
+export default function SalesList({onOpenForm} : TopNavBarProps) {
+    const { activeShop } = useAuth();
+    const [pageNumber, setPageNumber] = useState(1);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+    const limit = 10;
+    const [isDownloading, setIsDownloading] = useState(false);
+
+    const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, invoice: any) => {
+        setAnchorEl(event.currentTarget);
+        setSelectedInvoice(invoice);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+        setSelectedInvoice(null);
+    };
+
+    const handleEditClick = () => {
+        onOpenForm(selectedInvoice.id);
+        handleMenuClose();
+    };
+
+    const handleDownloadClick = async () => {
+        try {
+            if (!selectedInvoice) return;
+            setIsDownloading(true);
+            const pdfBlob = await generatePdf(selectedInvoice.id);
+            const url = window.URL.createObjectURL(pdfBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `invoice-${selectedInvoice.serialNo}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            handleMenuClose();
+        } catch (error) {
+            console.error('Error downloading PDF:', error);
+            toast.error('Failed to download PDF. Please try again.');
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
+    const { data: invoicesData, isLoading, error } = useQuery({
+        queryKey: ['invoices', activeShop?.id, pageNumber],
+        queryFn: () => listInvoices(activeShop?.id as string, pageNumber, limit),
+        enabled: !!activeShop?.id,
+    });
+
+    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+        setPageNumber(value);
+    };
+
+    if (isLoading) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" height="200px">
+                <Typography>Loading...</Typography>
+            </Box>
+        );
     }
-]
-export default function SalesList() {
-    const [pageNumber, setPageNumber] = useState(2);
+
+    if (error) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" height="200px">
+                <Typography color="error">Error loading invoices</Typography>
+            </Box>
+        );
+    }
+
     return (
         <Box marginTop={'2rem'}>
             <Typography color={'grey.400'} variant="mdSemibold" pb={'1rem'}>
@@ -71,13 +101,13 @@ export default function SalesList() {
                             </TableCell>
                             <TableCell sx={{ minWidth: '125px' }}>
                                 <Typography variant="xsSemibold" color={'grey.400'}>
-                                    Code
+                                    Invoice
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{ minWidth: '110px' }}>
                                 <Typography variant="xsSemibold" color={'grey.400'}
                                     textAlign={'right'}>
-                                    Total Price
+                                    Total
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{ minWidth: '110px' }}>
@@ -89,34 +119,34 @@ export default function SalesList() {
                             <TableCell sx={{ minWidth: '110px' }}>
                                 <Typography variant="xsSemibold" color={'grey.400'}
                                     textAlign={'right'}>
-                                    Invoice
+                                    Invoice Actions
                                 </Typography>
                             </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {salesList.map((product, index) => (
-                            <TableRow key={product.id}
+                        {invoicesData?.data.invoices.map((invoice, index) => (
+                            <TableRow key={invoice.id}
                                 sx={{ backgroundColor: index % 2 === 0 ? 'grey.800' : 'unset' }}
                             >
                                 <TableCell>
                                     <Typography color={'grey.300'} variant="smRegular">
-                                        {product.name}
+                                        {invoice.billTo.name}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
                                     <Typography color={'grey.300'} variant="smRegular">
-                                        {product.code}
+                                        {invoice.serialNo}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
                                     <Typography color={'grey.300'} variant="smRegular" textAlign={'right'}>
-                                        {`${product.price_currency} ${product.total_price}`}
+                                        ₹ {Number(invoice.total).toFixed(2)}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
                                     <Typography color={'grey.300'} variant="smRegular" textAlign={'center'}>
-                                        {new Date(product.create_at).toDateString()}
+                                        {new Date(invoice.date).toDateString()}
                                     </Typography>
                                 </TableCell>
                                 <TableCell sx={{ minWidth: '110px' }}>
@@ -125,9 +155,9 @@ export default function SalesList() {
                                         <Button
                                             variant="text"
                                             color="error"
-                                            // onClick={() => onEditClick(product)}
+                                            onClick={(e) => handleMenuClick(e, invoice)}
                                         >
-                                            View Invoice
+                                            Actions
                                         </Button>
                                     </Typography>
                                 </TableCell>
@@ -136,6 +166,19 @@ export default function SalesList() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+            >
+                <MenuItem onClick={handleEditClick}>Edit</MenuItem>
+                <MenuItem 
+                    onClick={handleDownloadClick}
+                    disabled={isDownloading}
+                >
+                    {isDownloading ? 'Downloading...' : 'Download'}
+                </MenuItem>
+            </Menu>
             <Box display={'flex'}
                 justifyContent={{ md: 'space-between' }}
                 alignItems={'flex-end'}
@@ -143,20 +186,18 @@ export default function SalesList() {
                 <Button
                     variant="semiDarkContained"
                     disabled={pageNumber === 1}
-                    onClick={() => []}
+                    onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
                     startIcon={<IconArrowLeft size={16} />}
-
                 >
                     Prev
                 </Button>
-                <Pagination count={12}
+                <Pagination
+                    count={Math.ceil((invoicesData?.data.pagination.total || 0) / limit)}
                     variant="text"
                     shape="rounded"
                     sx={{ mt: '2rem' }}
                     page={pageNumber}
-                    onChange={(event, value) => {
-                        return []
-                    }}
+                    onChange={handlePageChange}
                     siblingCount={3}
                     renderItem={(item) => <PaginationItem {...item} />}
                     hideNextButton={true}
@@ -164,14 +205,13 @@ export default function SalesList() {
                 />
                 <Button
                     variant="semiDarkContained"
-                    disabled={pageNumber === 1} // this will change
-                    onClick={() => []}
+                    disabled={pageNumber >= Math.ceil((invoicesData?.data.pagination.total || 0) / limit)}
+                    onClick={() => setPageNumber(prev => prev + 1)}
                     startIcon={<IconArrowRight size={16} />}
-
                 >
                     Next
                 </Button>
             </Box>
         </Box>
-    )
+    );
 }

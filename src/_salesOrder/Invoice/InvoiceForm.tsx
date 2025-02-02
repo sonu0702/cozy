@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Box, Stack, TextField, Typography, Divider, IconButton, Checkbox, FormControlLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -9,7 +9,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import InvoiceModal from './InvoiceModal';
 import InvoiceTable from './InvoiceTable';
 import { useAuth } from '@/_global/components/context/AuthContext';
-import { createInvoice } from '@/_global/api/api';
+import { createInvoice, getInvoice, updateInvoice } from '@/_global/api/api';
 import { CreateInvoiceRequest } from '@/_global/api/types';
 
 interface InvoiceItem {
@@ -54,61 +54,25 @@ interface InvoiceDetails {
 
 interface InvoiceForm {
     onClose: () => void;
+    invoiceId?: string | null;
 }
 
-const convertToWords = (amount: number): string => {
-    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
-    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-    const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-
-    const convertGroup = (n: number): string => {
-        if (n === 0) return '';
-        else if (n < 10) return ones[n];
-        else if (n < 20) return teens[n - 10];
-        else if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + ones[n % 10] : '');
-        else return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' ' + convertGroup(n % 100) : '');
-    };
-
-    const wholePart = Math.floor(amount);
-    const decimalPart = Math.round((amount - wholePart) * 100);
-
-    if (wholePart === 0 && decimalPart === 0) return 'Zero';
-
-    let result = '';
-    const crores = Math.floor(wholePart / 10000000);
-    const lakhs = Math.floor((wholePart % 10000000) / 100000);
-    const thousands = Math.floor((wholePart % 100000) / 1000);
-    const hundreds = wholePart % 1000;
-
-    if (crores > 0) result += convertGroup(crores) + ' Crore ';
-    if (lakhs > 0) result += convertGroup(lakhs) + ' Lakh ';
-    if (thousands > 0) result += convertGroup(thousands) + ' Thousand ';
-    if (hundreds > 0) result += convertGroup(hundreds);
-
-    result = result.trim();
-    if (decimalPart > 0) {
-        result += ' and ' + convertGroup(decimalPart) + ' Paise';
-    } else {
-        result += ' Rupees Only';
-    }
-
-    return result;
-};
-
-const InvoiceForm: React.FC<InvoiceForm> = ({ onClose }) => {
+const InvoiceForm: React.FC<InvoiceForm> = ({ onClose, invoiceId }) => {
+    console.log("InvoiceForm", invoiceId);
     const { user, activeShop } = useAuth();
     const [items, setItems] = useState<InvoiceItem[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentItem, setCurrentItem] = useState<InvoiceItem | null>(null);
     const [editMode, setEditMode] = useState(false);
     const [copyBillToShip, setCopyBillToShip] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [invoiceDetails, setInvoiceDetails] = useState<InvoiceDetails>(() => ({
         gstin: activeShop?.gstin || 'GSTIN123456789',
         address: activeShop?.address || '123 Business Park, Tech Hub, Bangalore',
         serialNo: `INV-${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
         date: new Date().toLocaleDateString('en-GB'),
         panNo: activeShop?.pan || 'PANABCD1234E',
-        cinNo: activeShop?.cin || 'CIN123456789',
+        cinNo: 'CIN123456789',
         state: activeShop?.state || 'Karnataka',
         stateCode: activeShop?.state_code || '29',
         billTo: {
@@ -126,6 +90,76 @@ const InvoiceForm: React.FC<InvoiceForm> = ({ onClose }) => {
             gstin: 'Client GSTIN'
         }
     }));
+
+    useEffect(() => {
+        const fetchInvoiceData = async () => {
+            if (invoiceId && activeShop?.id) {
+                setIsLoading(true);
+                try {
+                    const response = await getInvoice(invoiceId);
+                    const invoice = response.data;
+                    setInvoiceDetails({
+                        gstin: invoice.gstin,
+                        address: invoice.address,
+                        serialNo: invoice.serialNo,
+                        date: new Date(invoice.date).toLocaleDateString('en-GB'),
+                        panNo: invoice.panNo,
+                        cinNo: invoice.cinNo,
+                        state: invoice.state,
+                        stateCode: invoice.stateCode,
+                        billTo: invoice.billTo,
+                        shipTo: invoice.shipTo
+                    });
+                    setItems(invoice.items);
+                } catch (error) {
+                    console.error('Failed to fetch invoice:', error);
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        fetchInvoiceData();
+    }, [invoiceId, activeShop?.id]);
+
+    const convertToWords = (amount: number): string => {
+        const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+        const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+        const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    
+        const convertGroup = (n: number): string => {
+            if (n === 0) return '';
+            else if (n < 10) return ones[n];
+            else if (n < 20) return teens[n - 10];
+            else if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + ones[n % 10] : '');
+            else return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' ' + convertGroup(n % 100) : '');
+        };
+    
+        const wholePart = Math.floor(amount);
+        const decimalPart = Math.round((amount - wholePart) * 100);
+    
+        if (wholePart === 0 && decimalPart === 0) return 'Zero';
+    
+        let result = '';
+        const crores = Math.floor(wholePart / 10000000);
+        const lakhs = Math.floor((wholePart % 10000000) / 100000);
+        const thousands = Math.floor((wholePart % 100000) / 1000);
+        const hundreds = wholePart % 1000;
+    
+        if (crores > 0) result += convertGroup(crores) + ' Crore ';
+        if (lakhs > 0) result += convertGroup(lakhs) + ' Lakh ';
+        if (thousands > 0) result += convertGroup(thousands) + ' Thousand ';
+        if (hundreds > 0) result += convertGroup(hundreds);
+    
+        result = result.trim();
+        if (decimalPart > 0) {
+            result += ' and ' + convertGroup(decimalPart) + ' Paise';
+        } else {
+            result += ' Rupees Only';
+        }
+    
+        return result;
+    };
 
     const addItem = (item: InvoiceItem) => {
         setItems([...items, item]);
@@ -191,10 +225,14 @@ const InvoiceForm: React.FC<InvoiceForm> = ({ onClose }) => {
                 }))
             };
             
-            await createInvoice(activeShop?.id as string, invoiceData);
+            if (invoiceId && activeShop?.id) {
+                await updateInvoice(invoiceId, invoiceData);
+            } else {
+                await createInvoice(activeShop?.id as string, invoiceData);
+            }
             onClose();
         } catch (error) {
-            console.error('Failed to create invoice:', error);
+            console.error('Failed to save invoice:', error);
             // TODO: Add error handling UI
         }
     };
@@ -510,17 +548,17 @@ const InvoiceForm: React.FC<InvoiceForm> = ({ onClose }) => {
                             <Box width="200px">
                                 <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>TOTAL</Typography>
                                 <Box display="flex" justifyContent="space-between">
-                                    <Typography sx={{ fontSize: '0.7rem' }}>{totalTaxableValue.toFixed(2)}</Typography>
-                                    <Typography sx={{ fontSize: '0.7rem' }}>{totalCgstAmount.toFixed(2)}</Typography>
-                                    <Typography sx={{ fontSize: '0.7rem' }}>{totalSgstAmount.toFixed(2)}</Typography>
-                                    <Typography sx={{ fontSize: '0.7rem' }}>NA</Typography>
+                                    <Typography sx={{ fontSize: '0.7rem' }}>{Number(totalTaxableValue).toFixed(2)}</Typography>
+                                    <Typography sx={{ fontSize: '0.7rem' }}>{Number(totalCgstAmount).toFixed(2)}</Typography>
+                                    <Typography sx={{ fontSize: '0.7rem' }}>{Number(totalSgstAmount).toFixed(2)}</Typography>
+                                    <Typography sx={{ fontSize: '0.7rem' }}>{Number(totalIgstAmount).toFixed(2)}</Typography>
                                 </Box>
                             </Box>
                         </Box>
                         <Divider sx={{ my: 2 }} />
 
                         <Box>
-                            <Typography sx={{ fontSize: '0.7rem', mb: 1 }}>Total Invoice Value (In figure): {totalAmount.toFixed(2)}</Typography>
+                            <Typography sx={{ fontSize: '0.7rem', mb: 1 }}>Total Invoice Value (In figure): {Number(totalAmount).toFixed(2)}</Typography>
                             <Typography sx={{ fontSize: '0.7rem', mb: 2 }}>Total Invoice Value (In Words): {convertToWords(totalAmount)}</Typography>
                         </Box>
 
