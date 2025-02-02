@@ -23,7 +23,7 @@ export default function TopNavBar({onOpenForm} : TopNavBarProps) {
       <Button
         fullWidth
         variant="darkContained"
-        onClick={onOpenForm}
+        onClick={() => onOpenForm()}
         startIcon={<IconShoppingCart size={16} />}
         style={{ justifyContent: "flex-start" }}
       >

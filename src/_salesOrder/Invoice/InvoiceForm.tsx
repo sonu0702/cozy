@@ -57,8 +57,9 @@ interface InvoiceForm {
     invoiceId?: string | null;
 }
 
-const InvoiceForm: React.FC<InvoiceForm> = ({ onClose, invoiceId }) => {
-    console.log("InvoiceForm", invoiceId);
+const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) => {
+
+    console.log("InvoiceForm invoiceId:", invoiceId);
     const { user, activeShop } = useAuth();
     const [items, setItems] = useState<InvoiceItem[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -591,6 +592,6 @@ const InvoiceForm: React.FC<InvoiceForm> = ({ onClose, invoiceId }) => {
             )}
         </Box>
     );
-};
+});
 
 export default InvoiceForm;
