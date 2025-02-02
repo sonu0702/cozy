@@ -6,6 +6,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import { useAuth } from '../_global/components/context/AuthContext';
 import { Alert } from '@mui/material';
 import { getShopDetails } from '@/_global/api/api';
+import { Shop } from '@/_global/api/types';
 
 const SettingsPage: React.FC = () => {
   const { activeShop, setActiveShop } = useAuth();
@@ -44,14 +45,19 @@ const SettingsPage: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      const updatedShop = {
-        ...activeShop,
+      if (!activeShop?.id) {
+        throw new Error('Shop ID is required');
+      }
+
+      const updatedShop: Shop = {
+        id: activeShop.id,
         name: companyName,
         address: companyAddress,
         gstin: gstinNumber,
         pan: panNumber,
         state: state,
-        state_code: stateCode
+        state_code: stateCode,
+        is_default: activeShop.is_default
       };
 
       // Make API call to update shop
