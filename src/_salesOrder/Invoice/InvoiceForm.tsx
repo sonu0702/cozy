@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Box, Stack, TextField, Typography, Divider, IconButton, Checkbox, FormControlLabel } from '@mui/material';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Button, Box, Stack, TextField, Typography, Divider, IconButton, Checkbox, FormControlLabel, Autocomplete } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
@@ -9,8 +9,9 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import InvoiceModal from './InvoiceModal';
 import InvoiceTable from './InvoiceTable';
 import { useAuth } from '@/_global/components/context/AuthContext';
-import { createInvoice, getInvoice, updateInvoice } from '@/_global/api/api';
-import { CreateInvoiceRequest } from '@/_global/api/types';
+import { createInvoice, getInvoice, updateInvoice, billToAddressesSearch, shipToAddressesSearch } from '@/_global/api/api';
+import debounce from 'lodash/debounce';
+import { CreateInvoiceRequest, billToAddresses, shipToAddresses } from '@/_global/api/types';
 
 interface InvoiceItem {
     description: string;
@@ -58,9 +59,12 @@ interface InvoiceForm {
 }
 
 const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) => {
-
     console.log("InvoiceForm invoiceId:", invoiceId);
     const { user, activeShop } = useAuth();
+    const [billToOptions, setBillToOptions] = useState<billToAddresses[]>([]);
+    const [shipToOptions, setShipToOptions] = useState<shipToAddresses[]>([]);
+    const [billToSearchInput, setBillToSearchInput] = useState('');
+    const [shipToSearchInput, setShipToSearchInput] = useState('');
     const [items, setItems] = useState<InvoiceItem[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentItem, setCurrentItem] = useState<InvoiceItem | null>(null);
@@ -271,6 +275,9 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
     };
 
     const handleBillToChange = (field: string, value: string) => {
+        if (copyBillToShip) {
+            handleShipToChange(field, value);
+        }
         setInvoiceDetails(prev => ({
             ...prev,
             billTo: {
@@ -289,6 +296,40 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
             }
         }));
     };
+
+    const debouncedBillToSearch = useCallback(
+        debounce(async (searchQuery: string) => {
+            if (searchQuery.length >= 2 && activeShop?.id) {
+                try {
+                    const results = await billToAddressesSearch(activeShop.id, searchQuery);
+                    setBillToOptions(results);
+                } catch (error) {
+                    console.error('Error searching bill-to addresses:', error);
+                    setBillToOptions([]);
+                }
+            } else {
+                setBillToOptions([]);
+            }
+        }, 300),
+        [activeShop?.id]
+    );
+
+    const debouncedShipToSearch = useCallback(
+        debounce(async (searchQuery: string) => {
+            if (searchQuery.length >= 2 && activeShop?.id) {
+                try {
+                    const results = await shipToAddressesSearch(activeShop.id, searchQuery);
+                    setShipToOptions(results);
+                } catch (error) {
+                    console.error('Error searching ship-to addresses:', error);
+                    setShipToOptions([]);
+                }
+            } else {
+                setShipToOptions([]);
+            }
+        }, 300),
+        [activeShop?.id]
+    );
 
     return (
         <Box p={2} sx={{ fontSize: '0.7rem', position: 'relative' }}>
@@ -438,13 +479,36 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                 <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Bill To:</Typography>
                                 </Box>
                                 <Stack spacing={2}>
-                                    <TextField
-                                        label="Name"
+                                    <Autocomplete
+                                        freeSolo
+                                        options={billToOptions}
+                                        getOptionLabel={(option) => typeof option === 'string' ? option : option.name}
                                         value={invoiceDetails.billTo.name}
-                                        onChange={(e) => handleBillToChange('name', e.target.value)}
-                                        size="small"
-                                        fullWidth
-                                        sx={{ '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                        inputValue={billToSearchInput}
+                                        onInputChange={(event, newInputValue) => {
+                                            setBillToSearchInput(newInputValue);
+                                            debouncedBillToSearch(newInputValue);
+                                        }}
+                                        onChange={(event, newValue) => {
+                                            if (typeof newValue === 'string') {
+                                                handleBillToChange('name', newValue);
+                                            } else if (newValue) {
+                                                handleBillToChange('name', newValue.name);
+                                                handleBillToChange('address', newValue.address);
+                                                handleBillToChange('state', newValue.state);
+                                                handleBillToChange('stateCode', newValue.stateCode);
+                                                handleBillToChange('gstin', newValue.gstin);
+                                            }
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Name"
+                                                size="small"
+                                                fullWidth
+                                                sx={{ '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                            />
+                                        )}
                                     />
                                     <TextField
                                         label="Address"
@@ -497,13 +561,36 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                     />
                                 </Box>
                                 <Stack spacing={2}>
-                                    <TextField
-                                        label="Name"
+                                    <Autocomplete
+                                        freeSolo
+                                        options={shipToOptions}
+                                        getOptionLabel={(option) => typeof option === 'string' ? option : option.name}
                                         value={invoiceDetails.shipTo.name}
-                                        onChange={(e) => handleShipToChange('name', e.target.value)}
-                                        size="small"
-                                        fullWidth
-                                        sx={{ '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                        inputValue={shipToSearchInput}
+                                        onInputChange={(event, newInputValue) => {
+                                            setShipToSearchInput(newInputValue);
+                                            debouncedShipToSearch(newInputValue);
+                                        }}
+                                        onChange={(event, newValue) => {
+                                            if (typeof newValue === 'string') {
+                                                handleShipToChange('name', newValue);
+                                            } else if (newValue) {
+                                                handleShipToChange('name', newValue.name);
+                                                handleShipToChange('address', newValue.address);
+                                                handleShipToChange('state', newValue.state);
+                                                handleShipToChange('stateCode', newValue.stateCode);
+                                                handleShipToChange('gstin', newValue.gstin);
+                                            }
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Name"
+                                                size="small"
+                                                fullWidth
+                                                sx={{ '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                            />
+                                        )}
                                     />
                                     <TextField
                                         label="Address"

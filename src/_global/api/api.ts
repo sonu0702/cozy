@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RegisterRequest, LoginRequest, AuthResponse, UpdateShopRequest, ShopResponse, ShopsListResponse, CreateInvoiceRequest, InvoiceResponse, InvoicesListResponse } from './types';
+import { RegisterRequest, LoginRequest, AuthResponse, UpdateShopRequest, ShopResponse, ShopsListResponse, CreateInvoiceRequest, InvoiceResponse, InvoicesListResponse, billToAddresses, BillToAddressesListResponse, shipToAddresses, ShipToAddressesListResponse, searchProductList, SearchProductListResponse } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -113,5 +113,20 @@ export const generatePdf = async (invoiceId: string): Promise<Blob> => {
   const response = await api.get(`/invoices/${invoiceId}/pdf`, { responseType: 'blob' });
   return response.data;
 };
+
+export const billToAddressesSearch = async (shopId:string,name:string): Promise<billToAddresses[]> => {
+  const response = await api.get<BillToAddressesListResponse>(`invoices/search/bill-to/${shopId}?name=${name}`);
+  return response.data.data as billToAddresses[];
+} 
+
+export const shipToAddressesSearch = async (shopId:string,name:string): Promise<shipToAddresses[]> => {
+  const response = await api.get<ShipToAddressesListResponse>(`invoices/search/ship-to/${shopId}?name=${name}`);
+  return response.data.data as shipToAddresses[];
+} 
+
+export const productListSearchDescription = async (shopId:string,query:string): Promise<searchProductList[]> => {
+  const response = await api.get<SearchProductListResponse>(`shops/${shopId}/products/search?query=${query}`);
+  return response.data.data as searchProductList[];
+} 
 
 export default api;

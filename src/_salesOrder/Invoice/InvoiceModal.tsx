@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Stack, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Stack, Box, Autocomplete, CircularProgress } from '@mui/material';
+import { useAuth } from '@/_global/components/context/AuthContext';
+import { productListSearchDescription } from '@/_global/api/api';
+import debounce from 'lodash/debounce';
 
 interface InvoiceItem {
   description: string;
@@ -23,18 +26,39 @@ interface InvoiceModalProps {
 }
 
 const InvoiceModal: React.FC<InvoiceModalProps> = ({ item, onSave, onClose }) => {
+  const { activeShop } = useAuth();
   const [description, setDescription] = useState('');
   const [hsnSacCode, setHsnSacCode] = useState('');
-  const [quantity, setQuantity] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [options, setOptions] = useState<Array<any>>([]);
+  const [loading, setLoading] = useState(false);
+  const [quantity, setQuantity] = useState(1); // Set default quantity to 1
   const [unitValue, setUnitValue] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [taxableValue, setTaxableValue] = useState(0);
-  const [cgstRate, setCgstRate] = useState(9); // Default GST rate
+  const [cgstRate, setCgstRate] = useState(9);
   const [cgstAmount, setCgstAmount] = useState(0);
-  const [sgstRate, setSgstRate] = useState(9); // Default GST rate
+  const [sgstRate, setSgstRate] = useState(9);
   const [sgstAmount, setSgstAmount] = useState(0);
-  const [igstRate, setIgstRate] = useState(0); // Default IGST rate
+  const [igstRate, setIgstRate] = useState(0);
   const [igstAmount, setIgstAmount] = useState(0);
+
+  const debouncedSearch = debounce(async (query: string) => {
+    if (query.length >= 2 && activeShop?.id) {
+      setLoading(true);
+      try {
+        const results = await productListSearchDescription(activeShop.id, query);
+        setOptions(results);
+      } catch (error) {
+        console.error('Error searching products:', error);
+        setOptions([]);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setOptions([]);
+    }
+  }, 300);
 
   useEffect(() => {
     if (item) {
@@ -84,7 +108,47 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ item, onSave, onClose }) =>
       <DialogTitle sx={{ fontSize: '0.7rem' }}>{item ? 'Edit Item' : 'Add Item'}</DialogTitle>
       <DialogContent sx={{ fontSize: '0.6rem' }}>
         <Stack spacing={1}>
-          <TextField fullWidth label="Description" value={description} onChange={(e) => setDescription(e.target.value)} sx={{ fontSize: '0.6rem' }} />
+          <Autocomplete
+            freeSolo
+            options={options}
+            getOptionLabel={(option) => typeof option === 'string' ? option : option.name}
+            value={description}
+            inputValue={searchTerm}
+            onInputChange={(event, newInputValue) => {
+              setSearchTerm(newInputValue);
+              debouncedSearch(newInputValue);
+            }}
+            onChange={(event, newValue) => {
+              if (typeof newValue === 'string') {
+                setDescription(newValue);
+              } else if (newValue) {
+                setDescription(newValue.name);
+                setHsnSacCode(newValue.hsn || ''); // Update to use hsn field
+                setUnitValue(newValue.price || 0);
+                setQuantity(1); // Set quantity to 1 when product is selected
+                setCgstRate(newValue.cgstRate || 9);
+                setSgstRate(newValue.sgstRate || 9);
+                setIgstRate(newValue.igstRate || 0);
+              }
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Description"
+                fullWidth
+                sx={{ fontSize: '0.6rem' }}
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
+              />
+            )}
+          />
           <TextField fullWidth label="HSN/SAC Code" value={hsnSacCode} onChange={(e) => setHsnSacCode(e.target.value)} sx={{ fontSize: '0.6rem' }} />
           <Box display="flex" justifyContent="space-between">
             <TextField label="Quantity" type="number" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} sx={{ flex: 1, mr: 1, fontSize: '0.6rem' }} />

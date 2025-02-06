@@ -18,17 +18,19 @@ import {
 } from "react";
 import { debounce } from "lodash";
 import { IconSearch } from "@tabler/icons-react";
+import { billToAddressesSearch } from "@/_global/api/api";
+import { Address } from "@/_salesOrder/SalesForm/type";
 
-export default function SearchBar() {
-  const [options, setOptions] = useState<any[] | null>([]);
+interface SearchBarProps {
+  onAddressSelect: (address: Address) => void;
+  shopId: string;
+}
+
+export default function SearchBar({ onAddressSelect, shopId }: SearchBarProps) {
+  const [options, setOptions] = useState<Address[] | null>([]);
   const theme = useTheme();
   const ref = useRef<HTMLInputElement>();
   const loading = options === null;
-
-  /**
-   * @function trackKeyDownEvent - When user clicks (cntrl+/) shortcut
-   * bring the input in focus
-   */
 
   const trackKeyDownEvent = useCallback((e: globalThis.KeyboardEvent) => {
     if (e.ctrlKey && e.key === "/") {
@@ -42,6 +44,7 @@ export default function SearchBar() {
     window.addEventListener("keydown", trackKeyDownEvent);
     return () => window.removeEventListener("keydown", trackKeyDownEvent);
   }, [trackKeyDownEvent]);
+
   const debounceSearch = useMemo(
     () =>
       debounce(async (searchText: string) => {
@@ -49,16 +52,15 @@ export default function SearchBar() {
           const len = searchText.trim().length;
           if (len > 0 && len < 100) {
             setOptions(null);
-            // const options = await getSearchToken(searchText);
-            // setOptions(options);
+            const addresses = await billToAddressesSearch(shopId, searchText);
+            setOptions(addresses);
           }
         } catch (err) {
           console.log("err", err);
-          //   handleErrorMessage(err);
           setOptions([]);
         }
       }, 1000),
-    [],
+    [shopId],
   );
 
   return (
@@ -70,14 +72,27 @@ export default function SearchBar() {
       options={options ?? []}
       loading={loading}
       loadingText="Loading..."
-      renderOption={(props, option, state, ownerState) => {
-        return <Box>Render options</Box>;
+      getOptionLabel={(option) => option.name}
+      onChange={(_, value) => {
+        if (value) {
+          onAddressSelect(value);
+        }
       }}
+      renderOption={(props, option) => (
+        <Box component="li" {...props}>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <Typography variant="body1">{option.name}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              {option.address}, {option.state}
+            </Typography>
+          </Box>
+        </Box>
+      )}
       renderInput={(params) => (
         <TextField
           {...params}
           size="small"
-          placeholder="Search"
+          placeholder="Search Address"
           onChange={(e) => debounceSearch(e.target.value)}
           inputRef={ref}
           inputProps={{
@@ -113,6 +128,6 @@ export default function SearchBar() {
           }}
         />
       )}
-    ></Autocomplete>
+    />
   );
 }

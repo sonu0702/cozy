@@ -129,3 +129,51 @@ export interface InvoicesListResponse {
     }
   }
 }
+
+export interface billToAddresses {
+  name: string,
+  gstin: string,
+  state: string,
+  address: string,
+  stateCode: string
+}
+
+
+export interface BillToAddressesListResponse {
+  success: boolean;
+  message: string;
+  data: billToAddresses[];
+}
+
+export interface shipToAddresses {
+  name: string,
+  gstin: string,
+  state: string,
+  address: string,
+  stateCode: string
+}
+
+export interface ShipToAddressesListResponse {
+  success: boolean;
+  message: string;
+  data: shipToAddresses[];
+}
+
+export interface searchProductList {
+  id: string,
+  name: string,
+  price: number
+  hsn: string,
+  category: string,
+  cgst: number,
+  sgst: number,
+  igst: number,
+  createdAt: Date,
+  updatedAt: Date
+}
+
+export interface SearchProductListResponse {
+  success: boolean;
+  message: string;
+  data: searchProductList[];
+}
