@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RegisterRequest, LoginRequest, AuthResponse, UpdateShopRequest, ShopResponse, ShopsListResponse, CreateInvoiceRequest, InvoiceResponse, InvoicesListResponse, billToAddresses, BillToAddressesListResponse, shipToAddresses, ShipToAddressesListResponse, searchProductList, SearchProductListResponse } from './types';
+import { RegisterRequest, LoginRequest, AuthResponse, UpdateShopRequest, ShopResponse, ShopsListResponse, CreateInvoiceRequest, InvoiceResponse, InvoicesListResponse, billToAddresses, BillToAddressesListResponse, shipToAddresses, ShipToAddressesListResponse, searchProductList, SearchProductListResponse, DailySalesResponse, YearlySalesResponse, ProductsCountResponse, NetIncomeResponse } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -127,6 +127,26 @@ export const shipToAddressesSearch = async (shopId:string,name:string): Promise<
 export const productListSearchDescription = async (shopId:string,query:string): Promise<searchProductList[]> => {
   const response = await api.get<SearchProductListResponse>(`shops/${shopId}/products/search?query=${query}`);
   return response.data.data as searchProductList[];
+} 
+
+export const dailySalesAnalytics = async (shopId:string): Promise<DailySalesResponse> => {
+  const response = await api.get<DailySalesResponse>(`shops/${shopId}/analytics/today-sales`);
+  return response.data as DailySalesResponse;
+} 
+
+export const yearlySalesAnalytics = async (shopId:string): Promise<YearlySalesResponse> => {
+  const response = await api.get<YearlySalesResponse>(`shops/${shopId}/analytics/yearly-sales`);
+  return response.data as YearlySalesResponse;
+} 
+
+export const productCountAnalytics = async (shopId:string): Promise<ProductsCountResponse> => {
+  const response = await api.get<ProductsCountResponse>(`shops/${shopId}/analytics/product-count`);
+  return response.data as ProductsCountResponse;
+} 
+
+export const netIncomeAnalytics = async (shopId:string): Promise<NetIncomeResponse> => {
+  const response = await api.get<NetIncomeResponse>(`shops/${shopId}/analytics/net-income`);
+  return response.data as NetIncomeResponse;
 } 
 
 export default api;

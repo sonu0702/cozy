@@ -7,9 +7,10 @@ type Props = {
     symbol?: string;
     percent?: number;
     tooltip: string;
+    formatter: Intl.NumberFormat;
 }
 
-const CardChip = ({ title, value, symbol, percent, tooltip }: Props) => {
+const CardChip = ({ title, value, symbol, percent, tooltip, formatter }: Props) => {
     return (<Card>
         <Box
             display={'flex'}
@@ -32,7 +33,7 @@ const CardChip = ({ title, value, symbol, percent, tooltip }: Props) => {
             color={'gray.400'}
         >
             <Typography color={'grey.200'} variant="xlSemibold">
-                {value}{' '}
+                {formatter.format(value)}{' '}
                 <Typography component={'span'} variant="smMedium">
                     {symbol}
                 </Typography>

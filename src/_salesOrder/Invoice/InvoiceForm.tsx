@@ -37,6 +37,7 @@ interface InvoiceDetails {
     cinNo: string;
     state: string;
     stateCode: string;
+    shop_legal_name: string;
     billTo: {
         name: string;
         address: string;
@@ -80,6 +81,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
         cinNo: 'CIN123456789',
         state: activeShop?.state || 'Karnataka',
         stateCode: activeShop?.state_code || '29',
+        shop_legal_name: activeShop?.legal_name || activeShop?.name || '',
         billTo: {
             name: 'Client Name',
             address: 'Client Address',
@@ -112,6 +114,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                         cinNo: invoice.cinNo,
                         state: invoice.state,
                         stateCode: invoice.stateCode,
+                        shop_legal_name: invoice.shop_legal_name,
                         billTo: invoice.billTo,
                         shipTo: invoice.shipTo
                     });
@@ -199,6 +202,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                 cinNo: invoiceDetails.cinNo,
                 state: invoiceDetails.state,
                 stateCode: invoiceDetails.stateCode,
+                shop_legal_name: invoiceDetails.shop_legal_name,
                 billTo: {
                     name: invoiceDetails.billTo.name,
                     address: invoiceDetails.billTo.address,
@@ -657,7 +661,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
 
                         <Box display="flex" justifyContent="flex-end" mt={2}>
                             <Box textAlign="center">
-                                <Typography sx={{ fontSize: '0.7rem', mb: 1 }}>For Pivora Experiential Communications Pvt Ltd</Typography>
+                                <Typography sx={{ fontSize: '0.7rem', mb: 1 }}>For {invoiceDetails.shop_legal_name}</Typography>
                                 <Box sx={{ borderBottom: '1px solid black', width: '200px', mb: 1 }} />
                                 <Typography sx={{ fontSize: '0.7rem' }}>Signature of the Licencee or his authorised agent</Typography>
                             </Box>

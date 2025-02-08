@@ -29,6 +29,8 @@ export interface AuthResponse {
 export interface Shop {
   id: string;
   name: string;
+  legal_name?: string;
+  digital_signature?: string;
   gstin?: string | null;
   pan?: string | null;
   address?: string;
@@ -44,12 +46,15 @@ export interface Shop {
 
 export interface UpdateShopRequest {
   name: string;
-  gstin: string;
-  pan: string;
-  address: string;
-  cin: string;
-  state: string;
-  pin: string;
+  legal_name?: string;
+  digital_signature?: string;
+  gstin?: string | null;
+  pan?: string | null;
+  address?: string;
+  cin?: string | null;
+  state?: string;
+  state_code?: string;
+  pin?: string;
 }
 
 export interface ShopResponse {
@@ -97,6 +102,7 @@ export interface CreateInvoiceRequest {
   cinNo: string;
   state: string;
   stateCode: string;
+  shop_legal_name: string;
   billTo: PartyDetails;
   shipTo: PartyDetails;
   total: number;
@@ -176,4 +182,36 @@ export interface SearchProductListResponse {
   success: boolean;
   message: string;
   data: searchProductList[];
+}
+
+export interface DailySalesResponse {
+  success: boolean;
+  message: string;
+  data: {
+    total: number
+  }
+}
+
+export interface YearlySalesResponse {
+  success: boolean;
+  message: string;
+  data: {
+    total: number
+  }
+}
+
+export interface ProductsCountResponse {
+  success: boolean;
+  message: string;
+  data: {
+    count: number
+  }
+}
+
+export interface NetIncomeResponse {
+  success: boolean;
+  message: string;
+  data: {
+    total: number
+  }
 }

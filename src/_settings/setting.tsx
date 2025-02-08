@@ -5,39 +5,45 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import { useAuth } from '../_global/components/context/AuthContext';
 import { Alert } from '@mui/material';
-import { getShopDetails } from '@/_global/api/api';
+import { getShopDetails, updateShop } from '@/_global/api/api';
 import { Shop } from '@/_global/api/types';
 
 const SettingsPage: React.FC = () => {
   const { activeShop, setActiveShop } = useAuth();
-  console.log("activeShop",activeShop);
-  const [companyName, setCompanyName] = useState(activeShop?.name || '');
-  const [companyAddress, setCompanyAddress] = useState(activeShop?.address || '');
-  const [gstinNumber, setGstinNumber] = useState(activeShop?.gstin || '');
-  const [panNumber, setPanNumber] = useState(activeShop?.pan || '');
-  const [state, setState] = useState(activeShop?.state || '');
-  const [stateCode, setStateCode] = useState(activeShop?.state_code || '');
+  const [companyName, setCompanyName] = useState('');
+  const [companyAddress, setCompanyAddress] = useState('');
+  const [gstinNumber, setGstinNumber] = useState('');
+  const [panNumber, setPanNumber] = useState('');
+  const [state, setState] = useState('');
+  const [stateCode, setStateCode] = useState('');
+  const [legal_name, setLegalShopName] = useState('');
+  const [digital_signature, setDigitalSignature] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (activeShop) {
-      // get shop details from db
-      getShopDetails(activeShop?.id as string)
-      .then((data) => {
-       setCompanyName(data?.data.name|| '');
-       setCompanyAddress(data?.data.address|| '');
-       setGstinNumber(data?.data.gstin || '') ;
-       setPanNumber(data?.data.pan || '');
-       setState(data?.data.state || '');
-       setStateCode(data?.data.state_code || '');
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-    }
-    
-  }, [activeShop]);
+    const fetchShopDetails = async () => {
+      try {
+        if (!activeShop?.id) {
+          throw new Error('No active shop found');
+        }
+        const data = await getShopDetails(activeShop.id);
+        setCompanyName(data?.data.name || '');
+        setCompanyAddress(data?.data.address || '');
+        setGstinNumber(data?.data.gstin || '');
+        setPanNumber(data?.data.pan || '');
+        setState(data?.data.state || '');
+        setStateCode(data?.data.state_code || '');
+        setLegalShopName(data?.data?.legal_name || '');
+        setDigitalSignature(data?.data?.digital_signature || '');
+      } catch (err) {
+        console.error('Failed to fetch shop details:', err);
+        setError('Failed to fetch shop details. Please try again.');
+      }
+    };
+
+    fetchShopDetails();
+  }, []); // Run on every render
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -57,21 +63,16 @@ const SettingsPage: React.FC = () => {
         pan: panNumber,
         state: state,
         state_code: stateCode,
-        is_default: activeShop.is_default
+        is_default: activeShop.is_default,
+        legal_name: legal_name,
+        digital_signature: digital_signature,
       };
 
       // Make API call to update shop
-      // const response = await fetch(`/api/shops/${activeShop?.id}`, {
-      //   method: 'PUT',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(updatedShop),
-      // });
-
-      // if (!response.ok) {
-      //   throw new Error('Failed to update shop details');
-      // }
+      const response = await updateShop(activeShop.id, updatedShop)
+      if (!response.success != true) {
+        setError(response.message);
+      }
 
       // Update context
       setActiveShop(updatedShop);
@@ -84,8 +85,15 @@ const SettingsPage: React.FC = () => {
 
   return (
     <Container>
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-      <Box mb={2}>
+      {error && (
+            <Alert 
+                severity="error" 
+                onClose={() => setError('')}
+            >
+                {error}
+            </Alert>
+        )}
+        <Box mb={2}>
         <Typography variant="h6">Company Name</Typography>
         {isEditing ? (
           <TextField
@@ -95,6 +103,18 @@ const SettingsPage: React.FC = () => {
           />
         ) : (
           <Typography>{companyName}</Typography>
+        )}
+      </Box>
+      <Box mb={2}>
+        <Typography variant="h6">Company Legal Name</Typography>
+        {isEditing ? (
+          <TextField
+            fullWidth
+            value={legal_name}
+            onChange={(e) => setLegalShopName(e.target.value)}
+          />
+        ) : (
+          <Typography>{legal_name}</Typography>
         )}
       </Box>
       <Box mb={2}>

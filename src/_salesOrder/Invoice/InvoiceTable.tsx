@@ -85,8 +85,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ items, onEdit, onDelete }) 
             <TableCell sx={{ textAlign: 'right' }}>{Number(items.reduce((sum, item) => sum + item.cgstAmount, 0)).toFixed(2)}</TableCell>
             <TableCell></TableCell>
             <TableCell sx={{ textAlign: 'right' }}>{Number(items.reduce((sum, item) => sum + item.sgstAmount, 0)).toFixed(2)}</TableCell>
-            <TableCell>NA</TableCell>
-            <TableCell sx={{ textAlign: 'right' }}>NA</TableCell>
+            <TableCell></TableCell>
+            <TableCell sx={{ textAlign: 'right' }}>{Number(items.reduce((sum, item) => sum + item.igstAmount, 0)).toFixed(2)}</TableCell>
             <TableCell></TableCell>
           </TableRow>
         </TableFooter>

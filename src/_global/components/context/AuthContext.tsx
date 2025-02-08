@@ -149,6 +149,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Wrap setActiveShop to sync with localStorage
+  const handleSetActiveShop = (shop: Shop) => {
+    setActiveShop(shop);
+    // Update localStorage
+    if (typeof window !== 'undefined') {
+      const authData = JSON.parse(localStorage.getItem('auth') || '{}');
+      authData.activeShop = shop;
+      localStorage.setItem('auth', JSON.stringify(authData));
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       isAuthenticated,
@@ -158,11 +169,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       login,
       signup,
       logout,
-      setActiveShop,
+      setActiveShop: handleSetActiveShop,
       createShop,
       updateDefaultShop
     }}>
-
       {children}
     </AuthContext.Provider>
   );
