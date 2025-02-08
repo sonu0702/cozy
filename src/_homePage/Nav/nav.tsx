@@ -103,9 +103,8 @@ function Nav() {
             </Button>
             <Button
                 fullWidth
-                href={'https://x.com'}
-                variant="darkContained"
-                target="_blank"
+                onClick={() => handleNavigation('/help')}
+                variant={currentPath === '/help' ? 'lightContained' : 'darkContained'}
                 style={{ justifyContent: 'flex-start' }}
                 startIcon={<IconHeadset size={16} />}  
             >

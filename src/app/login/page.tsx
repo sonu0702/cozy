@@ -87,16 +87,7 @@ const Login = () => {
                         size="small"
                         margin="dense"
                     />
-                    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
-                        <Button 
-                            variant="text" 
-                            onClick={() => router.push('/forgot-password')}
-                            sx={{ mb: 1 }}
-                            size="small"
-                        >
-                            Forgot Password?
-                        </Button>
-                    </Box>
+
                     <Button 
                         variant="contained"
                         color="primary"
@@ -112,17 +103,10 @@ const Login = () => {
                         )}
                     </Button>
                     <Divider sx={{ width: '100%', mt: 2, mb: 1.5 }} />
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        Don't have an account?
+                    <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 1 }}>
+                        Don't have an account? This is an invite-only application.
+                        Please contact <Box component="span" sx={{ fontWeight: 'medium' }}>support@whizcozy.com</Box> for access.
                     </Typography>
-                    <Button 
-                        variant="outlined" 
-                        onClick={() => router.push('/signup')}
-                        fullWidth
-                        size="medium"
-                    >
-                        Sign Up
-                    </Button>
                 </Box>
             </Paper>
         </Container>
