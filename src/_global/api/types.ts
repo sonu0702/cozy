@@ -39,6 +39,12 @@ export interface Shop {
   state_code?: string;
   pin?: string;
   is_default?: boolean;
+  bank_detail?: {
+    bank_name?: string;
+    account_number?: string;
+    IFSC_code?: string;
+    account_holder_name?: string;
+  };
   owned_by?: User;
   createdAt?: string;
   updatedAt?: string;
@@ -55,6 +61,12 @@ export interface UpdateShopRequest {
   state?: string;
   state_code?: string;
   pin?: string;
+  bank_detail?: {
+    bank_name?: string;
+    account_number?: string;
+    IFSC_code?: string;
+    account_holder_name?: string;
+  };
 }
 
 export interface ShopResponse {
@@ -107,6 +119,12 @@ export interface CreateInvoiceRequest {
   shipTo: PartyDetails;
   total: number;
   items: InvoiceItem[];
+  bank_detail?: {
+    bank_name?: string;
+    account_number?: string;
+    IFSC_code?: string;
+    account_holder_name?: string;
+  };
 }
 
 export interface Invoice extends CreateInvoiceRequest {

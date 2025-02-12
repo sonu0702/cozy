@@ -52,6 +52,12 @@ interface InvoiceDetails {
         stateCode: string;
         gstin: string;
     };
+    bank_detail: {
+        bank_name?: string;
+        account_number?: string;
+        IFSC_code?: string;
+        account_holder_name?: string;
+    }
 }
 
 interface InvoiceForm {
@@ -95,7 +101,8 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
             state: 'Client State',
             stateCode: '00',
             gstin: 'Client GSTIN'
-        }
+        },
+        bank_detail: activeShop?.bank_detail || {}
     }));
 
     useEffect(() => {
@@ -116,7 +123,8 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                         stateCode: invoice.stateCode,
                         shop_legal_name: invoice.shop_legal_name,
                         billTo: invoice.billTo,
-                        shipTo: invoice.shipTo
+                        shipTo: invoice.shipTo,
+                        bank_detail: invoice.bank_detail || {}
                     });
                     setItems(invoice.items);
                 } catch (error) {
@@ -231,7 +239,8 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                     sgstAmount: item.sgstAmount,
                     igstRate: item.igstRate,
                     igstAmount: item.igstAmount
-                }))
+                })),
+                bank_detail: invoiceDetails.bank_detail||{}
             };
             
             if (invoiceId && activeShop?.id) {

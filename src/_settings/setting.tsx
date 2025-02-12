@@ -18,6 +18,10 @@ const SettingsPage: React.FC = () => {
   const [stateCode, setStateCode] = useState('');
   const [legal_name, setLegalShopName] = useState('');
   const [digital_signature, setDigitalSignature] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
+  const [ifscCode, setIfscCode] = useState('');
+  const [accountHolderName, setAccountHolderName] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,6 +40,10 @@ const SettingsPage: React.FC = () => {
         setStateCode(data?.data.state_code || '');
         setLegalShopName(data?.data?.legal_name || '');
         setDigitalSignature(data?.data?.digital_signature || '');
+        setBankName(data?.data?.bank_detail?.bank_name || '');
+        setAccountNumber(data?.data?.bank_detail?.account_number || '');
+        setIfscCode(data?.data?.bank_detail?.IFSC_code || '');
+        setAccountHolderName(data?.data?.bank_detail?.account_holder_name || '');
       } catch (err) {
         console.error('Failed to fetch shop details:', err);
         setError('Failed to fetch shop details. Please try again.');
@@ -66,6 +74,12 @@ const SettingsPage: React.FC = () => {
         is_default: activeShop.is_default,
         legal_name: legal_name,
         digital_signature: digital_signature,
+        bank_detail: {
+          bank_name: bankName,
+          account_number: accountNumber,
+          IFSC_code: ifscCode,
+          account_holder_name: accountHolderName
+        }
       };
 
       // Make API call to update shop
@@ -175,6 +189,54 @@ const SettingsPage: React.FC = () => {
           />
         ) : (
           <Typography>{stateCode}</Typography>
+        )}
+      </Box>
+      <Box mb={2}>
+        <Typography variant="h6">Bank Name</Typography>
+        {isEditing ? (
+          <TextField
+            fullWidth
+            value={bankName}
+            onChange={(e) => setBankName(e.target.value)}
+          />
+        ) : (
+          <Typography>{bankName}</Typography>
+        )}
+      </Box>
+      <Box mb={2}>
+        <Typography variant="h6">Account Number</Typography>
+        {isEditing ? (
+          <TextField
+            fullWidth
+            value={accountNumber}
+            onChange={(e) => setAccountNumber(e.target.value)}
+          />
+        ) : (
+          <Typography>{accountNumber}</Typography>
+        )}
+      </Box>
+      <Box mb={2}>
+        <Typography variant="h6">IFSC Code</Typography>
+        {isEditing ? (
+          <TextField
+            fullWidth
+            value={ifscCode}
+            onChange={(e) => setIfscCode(e.target.value)}
+          />
+        ) : (
+          <Typography>{ifscCode}</Typography>
+        )}
+      </Box>
+      <Box mb={2}>
+        <Typography variant="h6">Account Holder Name</Typography>
+        {isEditing ? (
+          <TextField
+            fullWidth
+            value={accountHolderName}
+            onChange={(e) => setAccountHolderName(e.target.value)}
+          />
+        ) : (
+          <Typography>{accountHolderName}</Typography>
         )}
       </Box>
       <Box mt={2}>
