@@ -14,6 +14,7 @@ import debounce from 'lodash/debounce';
 import { CreateInvoiceRequest, billToAddresses, shipToAddresses } from '@/_global/api/types';
 
 interface InvoiceItem {
+    id?: string,
     description: string;
     hsnSacCode: string;
     quantity: number;
@@ -82,25 +83,25 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
         gstin: activeShop?.gstin || 'GSTIN123456789',
         address: activeShop?.address || '123 Business Park, Tech Hub, Bangalore',
         serialNo: `INV-${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
-        date: new Date().toLocaleDateString('en-GB'),
+        date: new Date().toISOString(),
         panNo: activeShop?.pan || 'PANABCD1234E',
         cinNo: 'CIN123456789',
         state: activeShop?.state || 'Karnataka',
         stateCode: activeShop?.state_code || '29',
         shop_legal_name: activeShop?.legal_name || activeShop?.name || '',
         billTo: {
-            name: 'Client Name',
-            address: 'Client Address',
-            state: 'Client State',
-            stateCode: '00',
-            gstin: 'Client GSTIN'
+            name: '',
+            address: '',
+            state: '',
+            stateCode: '',
+            gstin: ''
         },
         shipTo: {
-            name: 'Client Name',
-            address: 'Client Address',
-            state: 'Client State',
-            stateCode: '00',
-            gstin: 'Client GSTIN'
+            name: '',
+            address: '',
+            state: '',
+            stateCode: '',
+            gstin: ''
         },
         bank_detail: activeShop?.bank_detail || {}
     }));
@@ -116,7 +117,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                         gstin: invoice.gstin,
                         address: invoice.address,
                         serialNo: invoice.serialNo,
-                        date: new Date(invoice.date).toLocaleDateString('en-GB'),
+                        date: new Date(invoice.date).toISOString(),
                         panNo: invoice.panNo,
                         cinNo: invoice.cinNo,
                         state: invoice.state,
@@ -201,6 +202,30 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            // Validate required fields
+            const errors = {
+                billTo: {
+                    name: !invoiceDetails.billTo.name.trim() ? 'Client name is required' : '',
+                    address: !invoiceDetails.billTo.address.trim() ? 'Address is required' : '',
+                    gstin: ''
+                },
+                shipTo: {
+                    name: !copyBillToShip && !invoiceDetails.shipTo.name.trim() ? 'Shipping name is required' : '',
+                    address: !copyBillToShip && !invoiceDetails.shipTo.address.trim() ? 'Shipping address is required' : '',
+                    gstin: ''
+                },
+                shop_legal_name: !invoiceDetails.shop_legal_name.trim() ? 'Shop legal name is required' : '',
+                gstin: !invoiceDetails.gstin.trim() ? 'GSTIN is required' : ''
+            };
+
+            setFormErrors(errors);
+
+            if (Object.values(errors).some(val => 
+                typeof val === 'string' ? val : Object.values(val).some(v => v)
+            )) {
+                return;
+            }
+
             const invoiceData: CreateInvoiceRequest = {
                 gstin: invoiceDetails.gstin,
                 address: invoiceDetails.address,
@@ -225,8 +250,12 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                     stateCode: invoiceDetails.shipTo.stateCode,
                     gstin: invoiceDetails.shipTo.gstin
                 },
-                total: totalAmount,
+                total: items.reduce((sum, item) => {
+                    const itemTotal = Number(item.taxableValue) + Number(item.cgstAmount) + Number(item.sgstAmount) + Number(item.igstAmount);
+                    return sum + itemTotal;
+                }, 0),
                 items: items.map(item => ({
+                    id: item?.id,
                     description: item.description,
                     hsnSacCode: item.hsnSacCode,
                     quantity: item.quantity,
@@ -240,7 +269,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                     igstRate: item.igstRate,
                     igstAmount: item.igstAmount
                 })),
-                bank_detail: invoiceDetails.bank_detail||{}
+                bank_detail: invoiceDetails.bank_detail || {}
             };
             
             if (invoiceId && activeShop?.id) {
@@ -251,14 +280,14 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
             onClose();
         } catch (error) {
             console.error('Failed to save invoice:', error);
-            // TODO: Add error handling UI
+            alert(error instanceof Error ? error.message : 'Failed to save invoice');
         }
     };
 
-    const totalTaxableValue = items.reduce((total, item) => total + item.taxableValue, 0);
-    const totalCgstAmount = items.reduce((total, item) => total + item.cgstAmount, 0);
-    const totalSgstAmount = items.reduce((total, item) => total + item.sgstAmount, 0);
-    const totalIgstAmount = items.reduce((total, item) => total + item.igstAmount, 0);
+    const totalTaxableValue = items.reduce((total, item) => total + Number(item.taxableValue), 0);
+    const totalCgstAmount = items.reduce((total, item) => total + Number(item.cgstAmount), 0);
+    const totalSgstAmount = items.reduce((total, item) => total + Number(item.sgstAmount), 0);
+    const totalIgstAmount = items.reduce((total, item) => total + Number(item.igstAmount), 0);
     const totalAmount = totalTaxableValue + totalCgstAmount + totalSgstAmount + totalIgstAmount;
 
     const handleBillToShipChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -275,7 +304,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
         if (newDate) {
             setInvoiceDetails(prev => ({
                 ...prev,
-                date: newDate.toLocaleDateString('en-GB')
+                date: newDate.toISOString()
             }));
         }
     };
@@ -287,7 +316,29 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
         }));
     };
 
+    const [formErrors, setFormErrors] = useState({
+        billTo: {
+            name: '',
+            address: '',
+            gstin: ''
+        },
+        shipTo: {
+            name: '',
+            address: '',
+            gstin: ''
+        },
+        shop_legal_name: '',
+        gstin: ''
+    });
+
     const handleBillToChange = (field: string, value: string) => {
+        setFormErrors(prev => ({
+            ...prev,
+            billTo: {
+                ...prev.billTo,
+                [field]: value.trim() ? '' : `${field.charAt(0).toUpperCase() + field.slice(1)} is required`
+            }
+        }));
         if (copyBillToShip) {
             handleShipToChange(field, value);
         }
@@ -400,7 +451,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                             </LocalizationProvider>
                                         ) : (
                                             <Typography sx={{ fontSize: '0.8rem' }}>
-                                                <strong>Date:</strong> {invoiceDetails.date}
+                                                <strong>Date:</strong> {new Date(invoiceDetails.date).toLocaleDateString('en-IN')}
                                             </Typography>
                                         )}
                                     </Box>
@@ -420,6 +471,9 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                                     onChange={(e) => handleInvoiceDetailsChange('gstin', e.target.value)}
                                                     size="small"
                                                     sx={{ flex: 1 }}
+                                                    error={!!formErrors.gstin}
+                                                    helperText={formErrors.gstin}
+                                                    required
                                                 />
                                             </>
                                         ) : (
@@ -445,6 +499,9 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                             multiline
                                             rows={2}
                                             size="small"
+                                            error={!!formErrors.billTo?.address}
+                                            helperText={formErrors.billTo?.address}
+                                            required
                                         />
                                     ) : (
                                         <Typography sx={{ fontSize: '0.8rem' }}>
@@ -496,7 +553,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                         freeSolo
                                         options={billToOptions}
                                         getOptionLabel={(option) => typeof option === 'string' ? option : option.name}
-                                        value={invoiceDetails.billTo.name}
+                                        value={billToOptions.find(opt => opt.name === invoiceDetails.billTo.name) || invoiceDetails.billTo.name}
                                         inputValue={billToSearchInput}
                                         onInputChange={(event, newInputValue) => {
                                             setBillToSearchInput(newInputValue);
@@ -507,19 +564,23 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                                 handleBillToChange('name', newValue);
                                             } else if (newValue) {
                                                 handleBillToChange('name', newValue.name);
-                                                handleBillToChange('address', newValue.address);
-                                                handleBillToChange('state', newValue.state);
-                                                handleBillToChange('stateCode', newValue.stateCode);
-                                                handleBillToChange('gstin', newValue.gstin);
+                                                handleBillToChange('address', newValue.address || '');
+                                                handleBillToChange('state', newValue.state || '');
+                                                handleBillToChange('stateCode', newValue.stateCode || '');
+                                                handleBillToChange('gstin', newValue.gstin || '');
                                             }
                                         }}
                                         renderInput={(params) => (
                                             <TextField
                                                 {...params}
-                                                label="Name"
+                                                label="Client Name"
+                                                value={invoiceDetails.billTo.name}
+                                                onChange={(e) => handleBillToChange('name', e.target.value)}
+                                                error={!!formErrors.billTo?.name}
+                                                helperText={formErrors.billTo?.name}
+                                                required
                                                 size="small"
-                                                fullWidth
-                                                sx={{ '& .MuiInputLabel-root': { fontWeight: 500 } }}
+                                                sx={{ flex: 1 }}
                                             />
                                         )}
                                     />
@@ -531,6 +592,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                         rows={3}
                                         size="small"
                                         fullWidth
+                                        placeholder="Enter complete billing address"
                                         sx={{ '& .MuiInputLabel-root': { fontWeight: 500 } }}
                                     />
                                     <Box display="flex" gap={2}>
@@ -539,6 +601,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                             value={invoiceDetails.billTo.state}
                                             onChange={(e) => handleBillToChange('state', e.target.value)}
                                             size="small"
+                                            placeholder="Enter state name"
                                             sx={{ flex: 1, '& .MuiInputLabel-root': { fontWeight: 500 } }}
                                         />
                                         <TextField
@@ -546,6 +609,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                             value={invoiceDetails.billTo.stateCode}
                                             onChange={(e) => handleBillToChange('stateCode', e.target.value)}
                                             size="small"
+                                            placeholder="Enter 2-digit state code"
                                             sx={{ flex: 1, '& .MuiInputLabel-root': { fontWeight: 500 } }}
                                         />
                                     </Box>
@@ -601,6 +665,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                                 label="Name"
                                                 size="small"
                                                 fullWidth
+                                                placeholder="Enter client name"
                                                 sx={{ '& .MuiInputLabel-root': { fontWeight: 500 } }}
                                             />
                                         )}

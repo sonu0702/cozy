@@ -192,6 +192,7 @@ export interface searchProductList {
   cgst: number,
   sgst: number,
   igst: number,
+  discount_percent: number,
   createdAt: Date,
   updatedAt: Date
 }
@@ -232,4 +233,24 @@ export interface NetIncomeResponse {
   data: {
     total: number
   }
+}
+
+export interface Product {
+  id?: string,
+  name: string,
+  price: number
+  hsn: string,
+  category: string,
+  cgst: number,
+  sgst: number,
+  igst: number,
+  discount_percent: number,
+  createdAt?: Date,
+  updatedAt?: Date
+}
+
+export interface ProductResponse {
+  success: boolean;
+  message: string;
+  data: Product;
 }

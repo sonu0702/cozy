@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Stack, Box, Autocomplete, CircularProgress } from '@mui/material';
 import { useAuth } from '@/_global/components/context/AuthContext';
-import { productListSearchDescription } from '@/_global/api/api';
+import { productListSearchDescription, createProduct } from '@/_global/api/api';
 import debounce from 'lodash/debounce';
+import toast from 'react-hot-toast';
 
 interface InvoiceItem {
+  id?: string;
   description: string;
   hsnSacCode: string;
   quantity: number;
@@ -27,11 +29,13 @@ interface InvoiceModalProps {
 
 const InvoiceModal: React.FC<InvoiceModalProps> = ({ item, onSave, onClose }) => {
   const { activeShop } = useAuth();
+  const [itemId, setItemId]= useState<string|undefined>(undefined);
   const [description, setDescription] = useState('');
   const [hsnSacCode, setHsnSacCode] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [options, setOptions] = useState<Array<any>>([]);
   const [loading, setLoading] = useState(false);
+  const [isNewProduct, setIsNewProduct] = useState(false);
   const [quantity, setQuantity] = useState(1); // Set default quantity to 1
   const [unitValue, setUnitValue] = useState(0);
   const [discount, setDiscount] = useState(0);
@@ -62,6 +66,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ item, onSave, onClose }) =>
 
   useEffect(() => {
     if (item) {
+      setItemId(item.id);
       setDescription(item.description);
       setHsnSacCode(item.hsnSacCode);
       setQuantity(item.quantity);
@@ -79,14 +84,16 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ item, onSave, onClose }) =>
 
   useEffect(() => {
     const calculatedTaxableValue = (quantity * unitValue) - discount;
-    setTaxableValue(calculatedTaxableValue);
-    setCgstAmount((calculatedTaxableValue * cgstRate) / 100);
-    setSgstAmount((calculatedTaxableValue * sgstRate) / 100);
-    setIgstAmount((calculatedTaxableValue * igstRate) / 100);
+    let calculatedTaxableValueWithDiscount = calculatedTaxableValue - ((calculatedTaxableValue * discount) / 100);
+    setTaxableValue(calculatedTaxableValueWithDiscount);
+    setCgstAmount((calculatedTaxableValueWithDiscount * cgstRate) / 100);
+    setSgstAmount((calculatedTaxableValueWithDiscount * sgstRate) / 100);
+    setIgstAmount((calculatedTaxableValueWithDiscount * igstRate) / 100);
   }, [quantity, unitValue, discount, cgstRate, sgstRate, igstRate]);
 
   const handleSave = () => {
     const newItem: InvoiceItem = {
+      id: itemId,
       description,
       hsnSacCode,
       quantity,
@@ -116,19 +123,41 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ item, onSave, onClose }) =>
             inputValue={searchTerm}
             onInputChange={(event, newInputValue) => {
               setSearchTerm(newInputValue);
+              setDescription(newInputValue);
               debouncedSearch(newInputValue);
+              // Check if the entered value matches any existing product
+              const productExists = options.some(option => 
+                typeof option === 'string' 
+                  ? option === newInputValue 
+                  : option.name === newInputValue
+              );
+              setIsNewProduct(!productExists && newInputValue.length > 0);
             }}
             onChange={(event, newValue) => {
+              console.log(`newValue: ${newValue}`)
               if (typeof newValue === 'string') {
                 setDescription(newValue);
-              } else if (newValue) {
+                setIsNewProduct(true);
+              } else if (newValue && typeof newValue === 'object') {
                 setDescription(newValue.name);
-                setHsnSacCode(newValue.hsn || ''); // Update to use hsn field
+                setHsnSacCode(newValue.hsn || '');
                 setUnitValue(newValue.price || 0);
-                setQuantity(1); // Set quantity to 1 when product is selected
+                setQuantity(1);
                 setCgstRate(newValue.cgstRate || 9);
                 setSgstRate(newValue.sgstRate || 9);
                 setIgstRate(newValue.igstRate || 0);
+                setIsNewProduct(false);
+              } else {
+                // When newValue is null (user cleared the input)
+                setDescription('');
+                setHsnSacCode('');
+                setUnitValue(0);
+                setQuantity(1);
+                setDiscount(0);
+                setCgstRate(9);
+                setSgstRate(9);
+                setIgstRate(0);
+                setIsNewProduct(false);
               }
             }}
             renderInput={(params) => (
@@ -173,8 +202,37 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ item, onSave, onClose }) =>
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleSave} sx={{ fontSize: '0.6rem' }}>Save</Button>
-        <Button onClick={onClose} sx={{ fontSize: '0.6rem' }}>Cancel</Button>
+        {isNewProduct && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={async () => {
+              if (!activeShop?.id) return;
+              try {
+                await createProduct(activeShop.id, {
+                  name: description,
+                  hsn: hsnSacCode,
+                  price: unitValue,
+                  category: '',
+                  cgst: cgstRate,
+                  sgst: sgstRate,
+                  igst: igstRate,
+                  discount_percent: discount
+                });
+                toast.success('Product created successfully');
+                setIsNewProduct(false);
+              } catch (error) {
+                console.error('Error creating product:', error);
+                toast.error('Failed to create product');
+              }
+            }}
+            sx={{ fontSize: '0.6rem', mr: 1 }}
+          >
+            Create Product
+          </Button>
+        )}
+        <Button onClick={handleSave} variant="contained" color="primary" sx={{ fontSize: '0.6rem', mr: 1 }}>Save</Button>
+        <Button onClick={onClose} variant="outlined" sx={{ fontSize: '0.6rem' }}>Cancel</Button>
       </DialogActions>
     </Dialog>
   );
