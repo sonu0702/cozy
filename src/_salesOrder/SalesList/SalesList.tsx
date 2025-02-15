@@ -3,16 +3,17 @@ import {
     Box, Button, Pagination, PaginationItem, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Typography, Menu, MenuItem
 } from "@mui/material";
-import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
+import { IconArrowLeft, IconArrowRight, IconRefresh } from "@tabler/icons-react";
 import { useState } from "react";
 import { useQuery } from '@tanstack/react-query';
 import { listInvoices, generatePdf } from '@/_global/api/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/_global/components/context/AuthContext';
+import { InvoiceType } from "@/_global/api/types";
 
 interface TopNavBarProps {
     onOpenForm: (invoiceId?: string) => void;
-  }
+}
 
 export default function SalesList({onOpenForm} : TopNavBarProps) {
     const { activeShop } = useAuth();
@@ -59,9 +60,9 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
         }
     };
 
-    const { data: invoicesData, isLoading, error } = useQuery({
+    const { data: invoicesData, isLoading, error, refetch, isFetching } = useQuery({
         queryKey: ['invoices', activeShop?.id, pageNumber],
-        queryFn: () => listInvoices(activeShop?.id as string, pageNumber, limit),
+        queryFn: () => listInvoices(activeShop?.id as string, pageNumber, limit, InvoiceType.INVOICE),
         enabled: !!activeShop?.id,
     });
 
@@ -87,9 +88,25 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
 
     return (
         <Box marginTop={'2rem'}>
-            <Typography color={'grey.400'} variant="mdSemibold" pb={'1rem'}>
-                Sales List
-            </Typography>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                <Typography color={'grey.400'} variant="mdSemibold">
+                    Sales List
+                </Typography>
+                <Button
+                    variant="text"
+                    color="primary"
+                    startIcon={<IconRefresh
+                        size={16}
+                        style={{
+                            animation: isFetching ? 'spin 1s linear infinite' : 'none'
+                        }}
+                    />}
+                    onClick={() => refetch()}
+                    disabled={isFetching}
+                >
+                    {isFetching ? 'Refreshing...' : 'Refresh'}
+                </Button>
+            </Box>
             <TableContainer>
                 <Table>
                     <TableHead>

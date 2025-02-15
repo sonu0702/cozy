@@ -215,6 +215,20 @@ export const makeThemeSchema = (
     },
   },
   // palette: { ...brandPalette },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: `
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      `,
+    },
+  },
 });
 
 /**

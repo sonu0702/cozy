@@ -11,7 +11,7 @@ import InvoiceTable from './InvoiceTable';
 import { useAuth } from '@/_global/components/context/AuthContext';
 import { createInvoice, getInvoice, updateInvoice, billToAddressesSearch, shipToAddressesSearch } from '@/_global/api/api';
 import debounce from 'lodash/debounce';
-import { CreateInvoiceRequest, billToAddresses, shipToAddresses } from '@/_global/api/types';
+import { CreateInvoiceRequest, InvoiceType, billToAddresses, shipToAddresses } from '@/_global/api/types';
 
 interface InvoiceItem {
     id?: string,
@@ -269,7 +269,8 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                     igstRate: item.igstRate,
                     igstAmount: item.igstAmount
                 })),
-                bank_detail: invoiceDetails.bank_detail || {}
+                bank_detail: invoiceDetails.bank_detail || {},
+                type: InvoiceType.INVOICE
             };
             
             if (invoiceId && activeShop?.id) {

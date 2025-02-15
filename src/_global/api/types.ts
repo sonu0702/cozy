@@ -1,3 +1,9 @@
+export enum InvoiceType {
+  INVOICE = 'INVOICE',
+  PURCHASE = 'PURCHASE',
+  QUOTATION = 'QUOTATION'
+}
+
 // Auth Types
 export interface RegisterRequest {
   username: string;
@@ -125,6 +131,7 @@ export interface CreateInvoiceRequest {
     IFSC_code?: string;
     account_holder_name?: string;
   };
+  type?: InvoiceType;
 }
 
 export interface Invoice extends CreateInvoiceRequest {

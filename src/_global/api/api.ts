@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RegisterRequest, LoginRequest, AuthResponse, UpdateShopRequest, ShopResponse, ShopsListResponse, CreateInvoiceRequest, InvoiceResponse, InvoicesListResponse, billToAddresses, BillToAddressesListResponse, shipToAddresses, ShipToAddressesListResponse, searchProductList, SearchProductListResponse, DailySalesResponse, YearlySalesResponse, ProductsCountResponse, NetIncomeResponse, Product, ProductResponse } from './types';
+import { RegisterRequest, LoginRequest, AuthResponse, UpdateShopRequest, ShopResponse, ShopsListResponse, CreateInvoiceRequest, InvoiceResponse, InvoicesListResponse, billToAddresses, BillToAddressesListResponse, shipToAddresses, ShipToAddressesListResponse, searchProductList, SearchProductListResponse, DailySalesResponse, YearlySalesResponse, ProductsCountResponse, NetIncomeResponse, Product, ProductResponse, InvoiceType } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -104,8 +104,8 @@ export const deleteInvoice = async (invoiceId: string): Promise<void> => {
   await api.delete(`/invoices/${invoiceId}`);
 };
 
-export const listInvoices = async (shopId:string, page:number, limit:number): Promise<InvoicesListResponse> => {
-  const response = await api.get<InvoicesListResponse>(`/shops/${shopId}/invoices`);
+export const listInvoices = async (shopId: string, page: number=1, limit: number=10, type: InvoiceType=InvoiceType.INVOICE): Promise<InvoicesListResponse> => {
+  const response = await api.get<InvoicesListResponse>(`/shops/${shopId}/invoices?page=${page}&limit=${limit}&type=${type}`);
   return response.data;
 };
 
