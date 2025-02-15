@@ -35,7 +35,7 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
                                 display="grid"
                                 gridTemplateColumns={{
                                     xs: '100%',
-                                    lg: 'minmax(315px, 360px) minmax(500px, 1200px)',
+                                    lg: 'minmax(250px, 300px) minmax(500px, 1200px)',
                                 }}
                                 gap={{ xs: '1rem', lg: '0' }}
                             >

@@ -20,8 +20,8 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
     const [pageNumber, setPageNumber] = useState(1);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
-    const limit = 10;
     const [isDownloading, setIsDownloading] = useState(false);
+    const limit = 10;
 
     const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, invoice: any) => {
         setAnchorEl(event.currentTarget);
@@ -36,6 +36,16 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
     const handleEditClick = () => {
         onOpenForm(selectedInvoice.id);
         handleMenuClose();
+    };
+
+    const { data: invoicesData, isLoading, error, refetch, isFetching } = useQuery({
+        queryKey: ['qotation-invoices', activeShop?.id, pageNumber],
+        queryFn: () => listInvoices(activeShop?.id as string, pageNumber, limit, InvoiceType.QUOTATION),
+        enabled: !!activeShop?.id,
+    });
+
+    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+        setPageNumber(value);
     };
 
     const handleDownloadClick = async () => {
@@ -60,16 +70,6 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
         }
     };
 
-    const { data: invoicesData, isLoading, error, refetch, isFetching } = useQuery({
-        queryKey: ['sales-invoices', activeShop?.id, pageNumber],
-        queryFn: () => listInvoices(activeShop?.id as string, pageNumber, limit, InvoiceType.INVOICE),
-        enabled: !!activeShop?.id,
-    });
-
-    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
-        setPageNumber(value);
-    };
-
     if (isLoading) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" height="200px">
@@ -90,7 +90,7 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
         <Box marginTop={'2rem'}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <Typography color={'grey.400'} variant="mdSemibold">
-                    Sales List
+                    Purchase List
                 </Typography>
                 <Button
                     variant="text"

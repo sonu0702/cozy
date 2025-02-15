@@ -20,7 +20,7 @@ function Nav() {
         <Box display={'flex'}
             flexDirection={'column'}
             alignItems={'flex-start'}
-            width={200}
+            width={250}
             // bgcolor={'red'}
             paddingLeft={'0.2rem'}
             gap={1.5}
@@ -63,6 +63,28 @@ function Nav() {
                 startIcon={<IconShoppingCart size={16} />}
             >
                 Sales Orders
+            </Button>
+            <Button
+                fullWidth
+                // href={'/salesorder'}
+                onClick={() => handleNavigation('/purchaseorder')}
+                variant={currentPath === '/purchaseorder' ? 'lightContained' : 'darkContained'}
+                // target="_blank"
+                style={{ justifyContent: 'flex-start' }}
+                startIcon={<IconShoppingCart size={16} />}
+            >
+                Purchase Orders
+            </Button>
+            <Button
+                fullWidth
+                // href={'/salesorder'}
+                onClick={() => handleNavigation('/quotation')}
+                variant={currentPath === '/quotation' ? 'lightContained' : 'darkContained'}
+                // target="_blank"
+                style={{ justifyContent: 'flex-start' }}
+                startIcon={<IconShoppingCart size={16} />}
+            >
+                Quotation
             </Button>
             {/* <Button
                 fullWidth

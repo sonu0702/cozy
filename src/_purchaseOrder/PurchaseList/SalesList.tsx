@@ -21,7 +21,6 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
     const limit = 10;
-    const [isDownloading, setIsDownloading] = useState(false);
 
     const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, invoice: any) => {
         setAnchorEl(event.currentTarget);
@@ -38,31 +37,9 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
         handleMenuClose();
     };
 
-    const handleDownloadClick = async () => {
-        try {
-            if (!selectedInvoice) return;
-            setIsDownloading(true);
-            const pdfBlob = await generatePdf(selectedInvoice.id);
-            const url = window.URL.createObjectURL(pdfBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', `invoice-${selectedInvoice.serialNo}.pdf`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(url);
-            handleMenuClose();
-        } catch (error) {
-            console.error('Error downloading PDF:', error);
-            toast.error('Failed to download PDF. Please try again.');
-        } finally {
-            setIsDownloading(false);
-        }
-    };
-
     const { data: invoicesData, isLoading, error, refetch, isFetching } = useQuery({
-        queryKey: ['sales-invoices', activeShop?.id, pageNumber],
-        queryFn: () => listInvoices(activeShop?.id as string, pageNumber, limit, InvoiceType.INVOICE),
+        queryKey: ['purchase-invoices', activeShop?.id, pageNumber],
+        queryFn: () => listInvoices(activeShop?.id as string, pageNumber, limit, InvoiceType.PURCHASE),
         enabled: !!activeShop?.id,
     });
 
@@ -90,7 +67,7 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
         <Box marginTop={'2rem'}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <Typography color={'grey.400'} variant="mdSemibold">
-                    Sales List
+                    Purchase List
                 </Typography>
                 <Button
                     variant="text"
@@ -189,12 +166,6 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
                 onClose={handleMenuClose}
             >
                 <MenuItem onClick={handleEditClick}>Edit</MenuItem>
-                <MenuItem 
-                    onClick={handleDownloadClick}
-                    disabled={isDownloading}
-                >
-                    {isDownloading ? 'Downloading...' : 'Download'}
-                </MenuItem>
             </Menu>
             <Box display={'flex'}
                 justifyContent={{ md: 'space-between' }}
