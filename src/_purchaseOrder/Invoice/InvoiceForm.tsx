@@ -743,7 +743,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                         </Box>
 
                         <Button type="submit" variant="contained" color="primary" sx={{ mt: 2, fontSize: '0.6rem' }}>
-                            Submit Invoice
+                            Submit Purchase Invoice
                         </Button>
                     </Stack>
                 </form>

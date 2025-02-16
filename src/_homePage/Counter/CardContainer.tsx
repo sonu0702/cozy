@@ -4,7 +4,7 @@ import { Box, Typography } from "@mui/material";
 import CardChip from "./CardChip";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/_global/components/context/AuthContext";
-import { dailySalesAnalytics, netIncomeAnalytics, productCountAnalytics, yearlySalesAnalytics } from "@/_global/api/api";
+import { dailySalesAnalytics, monthlySalesAnalytics, productCountAnalytics, yearlySalesAnalytics } from "@/_global/api/api";
 
 const numberFormatter = new Intl.NumberFormat('en-IN');
 
@@ -12,7 +12,7 @@ function CardContainer() {
     const { activeShop } = useAuth();
     const [todaySales, setTodaySales] = useState<number>(0);
     const [yearlySales, setYearlySales] = useState<number>(0);
-    const [netIncome, setNetIncome] = useState<number>(0);
+    const [monthlySales, setMonthlySales] = useState<number>(0);
     const [productCount, setProductCount] = useState<number>(0);
 
     useEffect(() => {
@@ -34,10 +34,10 @@ function CardContainer() {
             }
 
             try {
-                const income = await netIncomeAnalytics(activeShop.id);
-                setNetIncome(income.data.total);
+                const monthlySales = await monthlySalesAnalytics(activeShop.id);
+                setMonthlySales(monthlySales.data.total);
             } catch (error) {
-                setNetIncome(0);
+                setMonthlySales(0);
             }
 
             try {
@@ -74,17 +74,17 @@ function CardContainer() {
                     formatter={numberFormatter}
                 />
                 <CardChip
+                    title={'Monthly Total Sales'}
+                    value={monthlySales}
+                    symbol={'₹'}
+                    tooltip="Total sales for the current month"
+                    formatter={numberFormatter}
+                />
+                <CardChip
                     title={'Yearly Total Sales'}
                     value={yearlySales}
                     symbol={'₹'}
                     tooltip="Total sales for the current year"
-                    formatter={numberFormatter}
-                />
-                <CardChip
-                    title={'Net Income'}
-                    value={netIncome}
-                    symbol={'₹'}
-                    tooltip="Total net income"
                     formatter={numberFormatter}
                 />
                 <CardChip

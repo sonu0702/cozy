@@ -6,21 +6,24 @@ import {
 import { IconArrowLeft, IconArrowRight, IconRefresh } from "@tabler/icons-react";
 import { useState } from "react";
 import { useQuery } from '@tanstack/react-query';
-import { listInvoices, generatePdf } from '@/_global/api/api';
+import { listInvoices, generatePdf, convertToInvoice } from '@/_global/api/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/_global/components/context/AuthContext';
 import { InvoiceType } from "@/_global/api/types";
 
 interface TopNavBarProps {
     onOpenForm: (invoiceId?: string) => void;
+    refreshTrigger?: boolean;
 }
 
-export default function SalesList({onOpenForm} : TopNavBarProps) {
+export default function SalesList({onOpenForm, refreshTrigger} : TopNavBarProps) {
     const { activeShop } = useAuth();
     const [pageNumber, setPageNumber] = useState(1);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [isConverting, setIsConverting] = useState(false);
+
     const limit = 10;
 
     const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, invoice: any) => {
@@ -39,7 +42,7 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
     };
 
     const { data: invoicesData, isLoading, error, refetch, isFetching } = useQuery({
-        queryKey: ['qotation-invoices', activeShop?.id, pageNumber],
+        queryKey: ['qotation-invoices', activeShop?.id, pageNumber, refreshTrigger],
         queryFn: () => listInvoices(activeShop?.id as string, pageNumber, limit, InvoiceType.QUOTATION),
         enabled: !!activeShop?.id,
     });
@@ -69,6 +72,22 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
             setIsDownloading(false);
         }
     };
+
+    const handleConvertToInvoiceClick = async () => {
+        try {
+            if(!selectedInvoice) return;
+            setIsConverting(true);
+            await convertToInvoice(selectedInvoice.id);
+            toast.success('Successfully converted to invoice');
+            refetch();
+            handleMenuClose();
+        } catch (error) {
+            console.error('Error converting to invoice:', error);
+            toast.error('Failed to convert to invoice. Please try again.');
+        } finally {
+            setIsConverting(false);
+        }
+    }
 
     if (isLoading) {
         return (
@@ -194,6 +213,12 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
                     disabled={isDownloading}
                 >
                     {isDownloading ? 'Downloading...' : 'Download'}
+                </MenuItem>
+                <MenuItem
+                    onClick={handleConvertToInvoiceClick}
+                    disabled={isConverting}
+                >
+                        { isConverting? 'Converting...' : 'Convert to Invoice'}
                 </MenuItem>
             </Menu>
             <Box display={'flex'}

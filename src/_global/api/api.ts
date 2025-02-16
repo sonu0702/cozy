@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RegisterRequest, LoginRequest, AuthResponse, UpdateShopRequest, ShopResponse, ShopsListResponse, CreateInvoiceRequest, InvoiceResponse, InvoicesListResponse, billToAddresses, BillToAddressesListResponse, shipToAddresses, ShipToAddressesListResponse, searchProductList, SearchProductListResponse, DailySalesResponse, YearlySalesResponse, ProductsCountResponse, NetIncomeResponse, Product, ProductResponse, InvoiceType } from './types';
+import { RegisterRequest, LoginRequest, AuthResponse, UpdateShopRequest, ShopResponse, ShopsListResponse, CreateInvoiceRequest, InvoiceResponse, InvoicesListResponse, billToAddresses, BillToAddressesListResponse, shipToAddresses, ShipToAddressesListResponse, searchProductList, SearchProductListResponse, DailySalesResponse, YearlySalesResponse, ProductsCountResponse, Product, ProductResponse, InvoiceType, MonthlySalesResponse } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -144,9 +144,9 @@ export const productCountAnalytics = async (shopId:string): Promise<ProductsCoun
   return response.data as ProductsCountResponse;
 } 
 
-export const netIncomeAnalytics = async (shopId:string): Promise<NetIncomeResponse> => {
-  const response = await api.get<NetIncomeResponse>(`shops/${shopId}/analytics/net-income`);
-  return response.data as NetIncomeResponse;
+export const monthlySalesAnalytics = async (shopId:string): Promise<MonthlySalesResponse> => {
+  const response = await api.get<MonthlySalesResponse>(`shops/${shopId}/analytics/monthly-sales`);
+  return response.data as MonthlySalesResponse;
 } 
 
 export const createProduct = async (shopId:string, data: Product): Promise<ProductResponse> => {
@@ -154,4 +154,8 @@ export const createProduct = async (shopId:string, data: Product): Promise<Produ
   return response.data;
 };
 
+export const convertToInvoice = async (id:string): Promise<InvoiceResponse> => {
+  const response = await api.put<InvoiceResponse>(`/invoices/${id}/convert`);
+  return response.data;
+};
 export default api;

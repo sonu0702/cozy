@@ -64,9 +64,10 @@ interface InvoiceDetails {
 interface InvoiceForm {
     onClose: () => void;
     invoiceId?: string | null;
+    onSubmitSuccess: () => void;
 }
 
-const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) => {
+const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId, onSubmitSuccess }) => {
     console.log("InvoiceForm invoiceId:", invoiceId);
     const { user, activeShop } = useAuth();
     const [billToOptions, setBillToOptions] = useState<billToAddresses[]>([]);
@@ -279,6 +280,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                 await createInvoice(activeShop?.id as string, invoiceData);
             }
             onClose();
+            onSubmitSuccess()
         } catch (error) {
             console.error('Failed to save invoice:', error);
             alert(error instanceof Error ? error.message : 'Failed to save invoice');
@@ -743,7 +745,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                         </Box>
 
                         <Button type="submit" variant="contained" color="primary" sx={{ mt: 2, fontSize: '0.6rem' }}>
-                            Submit Invoice
+                            Submit Quotation
                         </Button>
                     </Stack>
                 </form>

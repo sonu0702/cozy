@@ -234,7 +234,7 @@ export interface ProductsCountResponse {
   }
 }
 
-export interface NetIncomeResponse {
+export interface MonthlySalesResponse {
   success: boolean;
   message: string;
   data: {

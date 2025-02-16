@@ -11,6 +11,7 @@ import InvoiceForm from "./Invoice/InvoiceForm";
 export default function PurchaseClient() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
+  const [refreshList, setRefreshList] = useState(false);
 
   const handleOpenForm = (invoiceId?: string) => {
     setSelectedInvoiceId(invoiceId || null);
@@ -26,11 +27,11 @@ export default function PurchaseClient() {
     <>
       <Suspense fallback={<div>Loading...</div>}>
         {isFormOpen ? (
-          <InvoiceForm onClose={handleCloseForm} invoiceId={selectedInvoiceId} />
+          <InvoiceForm onClose={handleCloseForm} invoiceId={selectedInvoiceId} onSubmitSuccess={() => setRefreshList(prev => !prev)} />
         ) : (
           <>
             <TopNavBar onOpenForm={handleOpenForm} />
-            <SalesList onOpenForm={handleOpenForm}/>
+            <SalesList onOpenForm={handleOpenForm} refreshTrigger={refreshList}/>
           </>
         )}
       </Suspense>
