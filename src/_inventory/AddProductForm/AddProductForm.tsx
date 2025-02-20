@@ -100,6 +100,7 @@ export default function AddProductForm({ open, onClose }: AddProductFormProps) {
                   error={!!errors.name}
                   helperText={errors.name?.message}
                   fullWidth
+                  autoFocus
                 />
               )}
             />

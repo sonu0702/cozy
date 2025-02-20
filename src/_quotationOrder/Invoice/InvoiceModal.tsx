@@ -167,6 +167,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ item, onSave, onClose }) =>
                 {...params}
                 label="Description"
                 fullWidth
+                autoFocus={true}
                 sx={{ fontSize: '0.6rem' }}
                 InputProps={{
                   ...params.InputProps,

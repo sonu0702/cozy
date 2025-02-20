@@ -68,6 +68,17 @@ interface InvoiceForm {
 }
 
 const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId, onSubmitSuccess }) => {
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.shiftKey && event.key.toLowerCase() === 'a') {
+                event.preventDefault();
+                openModal();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
     console.log("InvoiceForm invoiceId:", invoiceId);
     const { user, activeShop } = useAuth();
     const [billToOptions, setBillToOptions] = useState<billToAddresses[]>([]);
@@ -415,7 +426,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId, onS
                         onClick={() => openModal()}
                         sx={{ fontSize: '0.6rem' }}
                     >
-                        Add Item
+                        Add Item (Alt+A)
                     </Button>
                 </Box>
                 <IconButton onClick={onClose} size="small">
@@ -437,6 +448,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId, onS
                                                 onChange={(e) => handleInvoiceDetailsChange('serialNo', e.target.value)}
                                                 size="small"
                                                 sx={{ flex: 1 }}
+                                                autoFocus
                                             />
                                         ) : (
                                             <Typography sx={{ fontSize: '0.8rem' }}>
@@ -584,6 +596,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId, onS
                                                 required
                                                 size="small"
                                                 sx={{ flex: 1 }}
+                                                autoFocus
                                             />
                                         )}
                                     />

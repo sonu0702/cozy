@@ -77,6 +77,7 @@ const Signup = () => {
             fullWidth
             size="small"
             margin="dense"
+            autoFocus
           />
           <TextField 
             label="Username"

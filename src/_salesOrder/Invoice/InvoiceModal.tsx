@@ -109,12 +109,28 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ item, onSave, onClose }) =>
       igstAmount,
     };
     onSave(newItem);
+    // Focus on the submit button after saving
+    setTimeout(() => {
+      const submitButton = document.querySelector('button[type="submit"]');
+      if (submitButton instanceof HTMLElement) {
+        submitButton.focus();
+      }
+    }, 100);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    // Don't trigger save if Autocomplete dropdown is open
+    const isAutocompleteOpen = document.querySelector('.MuiAutocomplete-popper') !== null;
+    if (event.key === 'Enter' && !event.shiftKey && !isAutocompleteOpen) {
+      event.preventDefault();
+      handleSave();
+    }
   };
 
   return (
     <Dialog open={true} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ fontSize: '0.7rem' }}>{item ? 'Edit Item' : 'Add Item'}</DialogTitle>
-      <DialogContent sx={{ fontSize: '0.6rem' }}>
+      <DialogContent sx={{ fontSize: '0.6rem' }} onKeyDown={handleKeyDown}>
         <Stack spacing={1}>
           <Autocomplete
             freeSolo
@@ -162,23 +178,33 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ item, onSave, onClose }) =>
                 setIsNewProduct(false);
               }
             }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Description"
-                fullWidth
-                sx={{ fontSize: '0.6rem' }}
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                      {params.InputProps.endAdornment}
-                    </>
-                  ),
-                }}
-              />
-            )}
+            renderInput={(params) => {
+              const inputRef = React.useRef<HTMLInputElement>();
+              React.useEffect(() => {
+                if (inputRef.current) {
+                  inputRef.current.focus();
+                }
+              }, []);
+              return (
+                <TextField
+                  {...params}
+                  label="Description"
+                  fullWidth
+                  inputRef={inputRef}
+                  sx={{ fontSize: '0.6rem' }}
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                />
+              );
+            }}
+            
           />
           <TextField fullWidth label="HSN/SAC Code" value={hsnSacCode} onChange={(e) => setHsnSacCode(e.target.value)} sx={{ fontSize: '0.6rem' }} />
           <Box display="flex" justifyContent="space-between">

@@ -77,6 +77,7 @@ const Login = () => {
                         size="small"
                         margin="dense"
                         error={!!error}
+                        autoFocus
                     />
                     <TextField 
                         label="Password"

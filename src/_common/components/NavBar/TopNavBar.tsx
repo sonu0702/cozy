@@ -233,9 +233,9 @@ export default function TopNavBar() {
 
 const StyledPopover = styled(Popover)(({ theme }) => ({
   [`& .${paperClasses.root}`]: {
-    backgroundColor: theme.palette.grey[800],
+    backgroundColor: theme.palette.background.paper,
     minWidth: '300px',
-    border: `1px solid ${theme.palette.grey[700]}`,
+    border: `1px solid ${theme.palette.grey[200]}`,
     borderRadius: '0.5rem',
     padding: '0',
   },

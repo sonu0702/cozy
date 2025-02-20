@@ -67,6 +67,26 @@ interface InvoiceForm {
 }
 
 const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) => {
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.shiftKey && event.key.toLowerCase() === 'a') {
+                event.preventDefault();
+                openModal();
+            } else if (event.key === 'Enter' && !event.shiftKey) {
+                // Prevent form submission if the target is an input field in a modal or autocomplete
+                const target = event.target as HTMLElement;
+                if (target.tagName === 'INPUT' && 
+                    (target.closest('.MuiDialog-root') || target.closest('.MuiAutocomplete-root'))) {
+                    return;
+                }
+                event.preventDefault();
+                handleSubmit(event as unknown as React.FormEvent);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
     console.log("InvoiceForm invoiceId:", invoiceId);
     const { user, activeShop } = useAuth();
     const [billToOptions, setBillToOptions] = useState<billToAddresses[]>([]);
@@ -413,7 +433,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                         onClick={() => openModal()}
                         sx={{ fontSize: '0.6rem' }}
                     >
-                        Add Item
+                        Add Item (Shift+a)
                     </Button>
                 </Box>
                 <IconButton onClick={onClose} size="small">
@@ -435,6 +455,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                                 onChange={(e) => handleInvoiceDetailsChange('serialNo', e.target.value)}
                                                 size="small"
                                                 sx={{ flex: 1 }}
+                                                autoFocus
                                             />
                                         ) : (
                                             <Typography sx={{ fontSize: '0.8rem' }}>
@@ -582,6 +603,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                                 required
                                                 size="small"
                                                 sx={{ flex: 1 }}
+                                                autoFocus
                                             />
                                         )}
                                     />
@@ -743,7 +765,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                         </Box>
 
                         <Button type="submit" variant="contained" color="primary" sx={{ mt: 2, fontSize: '0.6rem' }}>
-                            Submit Invoice
+                            Submit Invoice (Enter)
                         </Button>
                     </Stack>
                 </form>
