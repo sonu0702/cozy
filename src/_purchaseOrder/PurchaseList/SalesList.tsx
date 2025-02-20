@@ -66,7 +66,7 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
     return (
         <Box marginTop={'2rem'}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography color={'grey.400'} variant="mdSemibold">
+                <Typography color={'grey.700'} variant="mdSemibold">
                     Purchase List
                 </Typography>
                 <Button
@@ -89,29 +89,29 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
                     <TableHead>
                         <TableRow>
                             <TableCell sx={{ minWidth: '125px' }}>
-                                <Typography variant="xsSemibold" color={'grey.400'}>
+                                <Typography variant="smBold">
                                     Name
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{ minWidth: '125px' }}>
-                                <Typography variant="xsSemibold" color={'grey.400'}>
+                                <Typography variant="smBold">
                                     Invoice
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{ minWidth: '110px' }}>
-                                <Typography variant="xsSemibold" color={'grey.400'}
+                                <Typography variant="smBold"
                                     textAlign={'right'}>
                                     Total
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{ minWidth: '110px' }}>
-                                <Typography variant="xsSemibold" color={'grey.400'}
+                                <Typography variant="smBold"
                                     textAlign={'center'}>
                                     Date
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{ minWidth: '110px' }}>
-                                <Typography variant="xsSemibold" color={'grey.400'}
+                                <Typography variant="smBold"
                                     textAlign={'right'}>
                                     Invoice Actions
                                 </Typography>
@@ -121,25 +121,25 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
                     <TableBody>
                         {invoicesData?.data.invoices.map((invoice, index) => (
                             <TableRow key={invoice.id}
-                                sx={{ backgroundColor: index % 2 === 0 ? 'grey.800' : 'unset' }}
+                                sx={{ backgroundColor: index % 2 === 0 ? 'grey.200' : 'unset' }}
                             >
                                 <TableCell>
-                                    <Typography color={'grey.300'} variant="smRegular">
+                                    <Typography color={'grey.700'} variant="smRegular">
                                         {invoice.billTo.name}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
-                                    <Typography color={'grey.300'} variant="smRegular">
+                                    <Typography color={'grey.700'} variant="smRegular">
                                         {invoice.serialNo}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
-                                    <Typography color={'grey.300'} variant="smRegular" textAlign={'right'}>
+                                    <Typography color={'grey.700'} variant="smRegular" textAlign={'right'}>
                                         ₹ {Number(invoice.total).toFixed(2)}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
-                                    <Typography color={'grey.300'} variant="smRegular" textAlign={'center'}>
+                                    <Typography color={'grey.700'} variant="smRegular" textAlign={'center'}>
                                         {new Date(invoice.date).toDateString()}
                                     </Typography>
                                 </TableCell>
@@ -172,7 +172,7 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
                 alignItems={'flex-end'}
             >
                 <Button
-                    variant="semiDarkContained"
+                    // variant="semiDarkContained"
                     disabled={pageNumber === 1}
                     onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
                     startIcon={<IconArrowLeft size={16} />}
@@ -192,7 +192,7 @@ export default function SalesList({onOpenForm} : TopNavBarProps) {
                     hidePrevButton={true}
                 />
                 <Button
-                    variant="semiDarkContained"
+                    // variant="semiDarkContained"
                     disabled={pageNumber >= Math.ceil((invoicesData?.data.pagination.total || 0) / limit)}
                     onClick={() => setPageNumber(prev => prev + 1)}
                     startIcon={<IconArrowRight size={16} />}

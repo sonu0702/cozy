@@ -127,15 +127,16 @@ export const makeThemeSchema = (
     },
   },
   palette: {
-    mode: 'dark',
+    mode: 'light',
     text: {
-      primary: '#FCFCFD',
-      secondary: '#98A2B3',
+      primary: '#101828',
+      secondary: '#475467',
     },
     primary: {
       main: '#FF3465',
       light: '#ffccd8',
       dark: '#cc0030',
+      contrastText: '#FFFFFF',
     },
     secondary: {
       '50': '#F8F9FC',
@@ -148,9 +149,10 @@ export const makeThemeSchema = (
       '700': '#363F72',
       '800': '#293056',
       '900': '#101323',
-      main: '#EAECF5',
-      light: '#717BBC',
+      main: '#4E5BA6',
+      light: '#D5D9EB',
       dark: '#293056',
+      contrastText: '#FFFFFF',
     },
     success: {
       '50': '#ECFDF3',
@@ -163,9 +165,10 @@ export const makeThemeSchema = (
       '700': '#027A48',
       '800': '#05603A',
       '900': '#054F31',
-      main: '#D1FADF',
-      light: '#32D583',
+      main: '#12B76A',
+      light: '#D1FADF',
       dark: '#05603A',
+      contrastText: '#FFFFFF',
     },
     warning: {
       '50': '#FFFAEB',
@@ -178,9 +181,10 @@ export const makeThemeSchema = (
       '700': '#B54708',
       '800': '#93370D',
       '900': '#7A2E0E',
-      main: '#FEF0C7',
-      light: '#FDB022',
+      main: '#F79009',
+      light: '#FEF0C7',
       dark: '#93370D',
+      contrastText: '#FFFFFF',
     },
     error: {
       '50': '#FEF3F2',
@@ -193,9 +197,10 @@ export const makeThemeSchema = (
       '700': '#B42318',
       '800': '#912018',
       '900': '#7A271A',
-      main: '#FEE4E2',
-      light: '#F97066',
+      main: '#F04438',
+      light: '#FEE4E2',
       dark: '#912018',
+      contrastText: '#FFFFFF',
     },
     grey: {
       '50': '#F9FAFB',
@@ -210,11 +215,11 @@ export const makeThemeSchema = (
       '900': '#101828',
     },
     background: {
-      default: '#101828',
-      paper: '#1D2939',
+      default: '#F9FAFB',
+      paper: '#FFFFFF',
     },
+    divider: '#E4E7EC',
   },
-  // palette: { ...brandPalette },
   components: {
     MuiCssBaseline: {
       styleOverrides: `
@@ -227,6 +232,63 @@ export const makeThemeSchema = (
           }
         }
       `,
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          padding: '1rem',
+          borderRadius: '1rem',
+          backgroundColor: '#FFFFFF',
+          boxShadow: '0px 4px 6px -2px rgba(16, 24, 40, 0.03), 0px 12px 16px -4px rgba(16, 24, 40, 0.08)',
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+          backgroundColor: '#FFFFFF',
+          boxShadow: '0px 4px 6px -2px rgba(16, 24, 40, 0.03), 0px 12px 16px -4px rgba(16, 24, 40, 0.08)',
+        },
+      },
+    },
+    MuiButton: {
+      defaultProps: {
+        style: {
+          textTransform: 'none',
+          borderRadius: '8px',
+          padding: '0.5rem 0.85rem',
+          fontWeight: 500,
+          fontSize: '16px',
+          lineHeight: '20px',
+        },
+      },
+      styleOverrides: {
+        root: {
+          '&.Mui-disabled': {
+            backgroundColor: '#F2F4F7',
+            color: '#98A2B3',
+          },
+        },
+        containedPrimary: {
+          background: 'linear-gradient(0deg, #FF3465, #FF3465), linear-gradient(180deg, #FF3465 0%, #E22553 100%)',
+          color: '#FFFFFF',
+          '&:hover': {
+            background: 'linear-gradient(0deg, #E22553, #E22553), linear-gradient(180deg, #FF3465 0%, #E22553 100%)',
+          },
+          '&:disabled': {
+            background: '#F2F4F7',
+            color: '#98A2B3',
+          },
+        },
+      },
+    },
+    MuiTypography: {
+      styleOverrides: {
+        root: {
+          color: '#101828',
+        },
+      },
     },
   },
 });
@@ -248,7 +310,7 @@ export const ComponentOverride: Components = {
     },
     styleOverrides: {
       paper: {
-        backgroundColor: '#101828',
+        backgroundColor: '#FFFFFF',
         minWidth: '40%',
         '@media (max-width: 780px)': {
           width: '100%',
@@ -360,7 +422,7 @@ export const ComponentOverride: Components = {
     styleOverrides: {
       root: {
         '&.Mui-disabled': {
-          backgroundColor: '#344054',
+          backgroundColor: '#F2F4F7',
           color: '#98A2B3',
         },
       },
@@ -368,7 +430,7 @@ export const ComponentOverride: Components = {
         background:
           'linear-gradient(0deg, var(--Brand-Red, #FF3465), var(--Brand-Red, #FF3465)), linear-gradient(180deg, #FF3465 0%, #E22553 100%)',
         '&:disabled': {
-          background: '#344054',
+          background: '#F2F4F7',
           color: '#98A2B3',
         },
       },
@@ -377,21 +439,21 @@ export const ComponentOverride: Components = {
       {
         props: { variant: 'lightContained' },
         style: {
-          color: '#101828',
-          backgroundColor: '#F9FAFB',
+          color: '#FFFFFF',
+          backgroundColor: '#ff3465',
           '&:hover': {
-            color: '#101828',
-            backgroundColor: '#F9FAFB',
+            color: '#FFFFFF',
+            backgroundColor: '#ff3465',
           },
         },
       },
       {
         props: { variant: 'lightText' },
         style: {
-          color: '#98A2B3',
+          color: '#ff3465',
           backgroundColor: 'transparent',
           '&:hover': {
-            color: '#98A2B3',
+            color: '#ff3465',
             backgroundColor: 'transparent',
           },
         },
@@ -399,11 +461,11 @@ export const ComponentOverride: Components = {
       {
         props: { variant: 'darkContained' },
         style: {
-          color: '#98A2B3',
-          backgroundColor: '#101828',
+          color: '#FFFFFF',
+          backgroundColor: '#98a2b3',
           '&:hover': {
-            color: '#D0D5DD',
-            backgroundColor: '#101828',
+            color: '#FFFFFF',
+            backgroundColor: '#1D2939',
           },
         },
       },
@@ -412,10 +474,10 @@ export const ComponentOverride: Components = {
         style: {
           fontSize: '0.8rem',
           fontWeight: '500',
-          color: '#D0D5DD',
-          backgroundColor: '#344054',
+          color: '#101828',
+          backgroundColor: '#F2F4F7',
           '&:hover': {
-            backgroundColor: '#344054',
+            backgroundColor: '#E4E7EC',
           },
         },
       },
@@ -455,10 +517,10 @@ export const ComponentOverride: Components = {
   MuiAppBar: {
     defaultProps: {
       style: {
-        background: '#101828',
+        background: '#FFFFFF',
         padding: '1rem 1.5rem',
         boxShadow: 'none',
-        borderBottom: `1px solid #1D2939`,
+        borderBottom: `1px solid #E4E7EC`,
       },
     },
   },

@@ -10,7 +10,7 @@ export default function TopNavBar() {
       justifyContent={"space-between"}
       alignItems={"center"}
     >
-      <Typography color={"grey.50"} variant="mdBold">
+      <Typography  variant="mdBold">
         Reports
       </Typography>
       <Button

@@ -16,12 +16,11 @@ export default function TopNavBar({onOpenForm} : TopNavBarProps) {
       justifyContent={"space-between"}
       alignItems={"center"}
     >
-      <Typography color={"grey.50"} variant="mdBold">
+      <Typography variant="mdBold">
         Quotaton
       </Typography>
       <Button
         fullWidth
-        variant="darkContained"
         onClick={() => onOpenForm()}
         startIcon={<IconShoppingCart size={16} />}
         style={{ justifyContent: "flex-start" }}

@@ -119,7 +119,7 @@ export default function TopNavBar() {
                       displayEmpty
                       sx={{
                         minWidth: 200,
-                        color: 'white',
+                        color: '#ff3465',
                         '& .MuiSelect-select': {
                           py: 1
                         }

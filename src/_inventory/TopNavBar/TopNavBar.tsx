@@ -16,7 +16,7 @@ export default function TopNavBar({ onAddClick }: TopNavBarProps) {
       justifyContent={"space-between"}
       alignItems={"center"}
     >
-      <Typography color={"grey.50"} variant="mdBold">
+      <Typography variant="mdBold">
         Inventory
       </Typography>
       <Suspense fallback={<div>Loading search...</div>}>
@@ -25,7 +25,6 @@ export default function TopNavBar({ onAddClick }: TopNavBarProps) {
       <Button
         fullWidth
         onClick={onAddClick}
-        variant="darkContained"
         startIcon={<IconBox size={16} />}
         style={{ justifyContent: "flex-start" }}
       >

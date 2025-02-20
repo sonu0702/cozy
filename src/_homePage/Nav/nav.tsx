@@ -26,7 +26,7 @@ function Nav() {
             gap={1.5}
         >
 
-            <Typography color={'grey.50'} variant="mdBold">
+            <Typography variant="mdBold">
                 General
             </Typography>
 
@@ -34,7 +34,7 @@ function Nav() {
                 fullWidth
                 // href={'/'}
                 onClick={() => handleNavigation('/')}
-                variant={currentPath === '/' ? 'lightContained' : 'darkContained'}
+                variant={currentPath === '/' ? 'lightContained' : undefined}
                 // target="_blank"
                 startIcon={<IconLayoutDashboard size={16} />}
                 style={{ justifyContent: 'flex-start' }}
@@ -57,7 +57,7 @@ function Nav() {
                 fullWidth
                 // href={'/salesorder'}
                 onClick={() => handleNavigation('/salesorder')}
-                variant={currentPath === '/salesorder' ? 'lightContained' : 'darkContained'}
+                variant={currentPath === '/salesorder' ? 'lightContained' : undefined}
                 // target="_blank"
                 style={{ justifyContent: 'flex-start' }}
                 startIcon={<IconShoppingCart size={16} />}
@@ -68,7 +68,7 @@ function Nav() {
                 fullWidth
                 // href={'/salesorder'}
                 onClick={() => handleNavigation('/purchaseorder')}
-                variant={currentPath === '/purchaseorder' ? 'lightContained' : 'darkContained'}
+                variant={currentPath === '/purchaseorder' ? 'lightContained' : undefined}
                 // target="_blank"
                 style={{ justifyContent: 'flex-start' }}
                 startIcon={<IconShoppingCart size={16} />}
@@ -79,7 +79,7 @@ function Nav() {
                 fullWidth
                 // href={'/salesorder'}
                 onClick={() => handleNavigation('/quotation')}
-                variant={currentPath === '/quotation' ? 'lightContained' : 'darkContained'}
+                variant={currentPath === '/quotation' ? 'lightContained' : undefined}
                 // target="_blank"
                 style={{ justifyContent: 'flex-start' }}
                 startIcon={<IconShoppingCart size={16} />}
@@ -109,14 +109,14 @@ function Nav() {
                 Reports
             </Button> */}
 
-            <Typography color={'grey.50'} variant="mdBold">
+            <Typography  variant="mdBold">
                 Support
             </Typography>
             <Button 
                 fullWidth
                 // href={'/reports'}
                 onClick={() => handleNavigation('/settings')}
-                variant={currentPath === '/settings' ? 'lightContained' : 'darkContained'}
+                variant={currentPath === '/settings' ? 'lightContained' : undefined}
                 // target="_blank"
                 style={{ justifyContent: 'flex-start' }}
                 startIcon={<IconSettings size={16} />}
@@ -126,7 +126,7 @@ function Nav() {
             <Button
                 fullWidth
                 onClick={() => handleNavigation('/help')}
-                variant={currentPath === '/help' ? 'lightContained' : 'darkContained'}
+                variant={currentPath === '/help' ? 'lightContained' : undefined}
                 style={{ justifyContent: 'flex-start' }}
                 startIcon={<IconHeadset size={16} />}  
             >

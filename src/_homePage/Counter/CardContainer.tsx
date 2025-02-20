@@ -52,16 +52,24 @@ function CardContainer() {
     }, [activeShop]);
 
     return (
-        <Box component={'main'}
-            display={'flex'}
-            flexDirection={'column'}
-            gap={1.5}
+        <Box
+            component={'main'}
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                p: 3,
+                backgroundColor: 'background.paper',
+                borderRadius: 2,
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}
         >
-            <Typography color={'grey.50'} variant="mdBold">
+            <Typography variant="h5" color="primary.main" sx={{ fontWeight: 600, mb: 1 }}>
                 Sales Summary
             </Typography>
 
-            <Box display={'grid'}
+            <Box
+                display={'grid'}
                 alignItems={'center'}
                 gap={'1rem'}
                 gridTemplateColumns={{ xs: '100%', md: 'repeat(4, 1fr)' }}

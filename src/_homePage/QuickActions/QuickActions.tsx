@@ -12,7 +12,7 @@ function QuickActions() {
             gap={1.5}
         >
 
-            <Typography color={'grey.50'} variant="mdBold">
+            <Typography  variant="mdBold">
                 Quick Actions
             </Typography>
 

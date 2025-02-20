@@ -29,7 +29,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ items, onEdit, onDelete }) 
     <TableContainer component={Paper} sx={{ mt: 2, fontSize: '0.6rem' }}>
       <Table size="small">
         <TableHead>
-          <TableRow>
+          <TableRow sx={{backgroundColor:"grey.200"}}>
             <TableCell sx={{ width: '35%' }}>Description of Service</TableCell>
             <TableCell sx={{ width: '10%' }}>HSN/SAC Code</TableCell>
             <TableCell sx={{ width: '5%' }}>Unit</TableCell>
@@ -61,7 +61,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ items, onEdit, onDelete }) 
         </TableHead>
         <TableBody>
           {items.map((item, index) => (
-            <TableRow key={index}>
+            <TableRow key={index} sx={{ backgroundColor: index % 2 != 0 ? 'grey.200' : 'unset' }}>
               <TableCell>{item.description}</TableCell>
               <TableCell>{item.hsnSacCode}</TableCell>
               <TableCell>1</TableCell>

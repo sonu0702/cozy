@@ -16,10 +16,10 @@ const CardChip = ({ title, value, symbol, percent, tooltip, formatter }: Props) 
             display={'flex'}
             justifyContent={'space-between'}
             alignItems={'center'}
-            color={'gray.400'}
+            // color={'gray.400'}
             mb={'1rem'}
         >
-            <Typography color={'grey.300'} variant="smMedium">
+            <Typography  variant="smMedium">
                 {title}
             </Typography>
             <Tooltip title={tooltip} arrow>
@@ -30,9 +30,9 @@ const CardChip = ({ title, value, symbol, percent, tooltip, formatter }: Props) 
             display={'flex'}
             justifyContent={'space-between'}
             alignItems={'center'}
-            color={'gray.400'}
+           
         >
-            <Typography color={'grey.200'} variant="xlSemibold">
+            <Typography  variant="xlSemibold">
                 {formatter.format(value)}{' '}
                 <Typography component={'span'} variant="smMedium">
                     {symbol}
