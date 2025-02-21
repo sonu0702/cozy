@@ -259,7 +259,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ item, onSave, onClose }) =>
             Create Product
           </Button>
         )}
-        <Button onClick={handleSave} variant="contained" color="primary" sx={{ fontSize: '0.6rem', mr: 1 }}>Save</Button>
+        <Button onClick={handleSave} variant="contained" color="primary" sx={{ fontSize: '0.6rem', mr: 1 }}>Save(Enter)</Button>
         <Button onClick={onClose} variant="outlined" sx={{ fontSize: '0.6rem' }}>Cancel</Button>
       </DialogActions>
     </Dialog>

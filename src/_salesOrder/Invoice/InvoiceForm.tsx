@@ -433,7 +433,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                         onClick={() => openModal()}
                         sx={{ fontSize: '0.6rem' }}
                     >
-                        Add Item (Shift+a)
+                        Add Item (Shift+A)
                     </Button>
                 </Box>
                 <IconButton onClick={onClose} size="small">
@@ -733,7 +733,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
 
                         <Divider />
                         <InvoiceTable items={items} onEdit={openModal} onDelete={deleteItem} />
-                        <Box display="flex" justifyContent="flex-end" mt={1}>
+                        {/* <Box display="flex" justifyContent="flex-end" mt={1}>
                             <Box width="200px">
                                 <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>TOTAL</Typography>
                                 <Box display="flex" justifyContent="space-between">
@@ -743,11 +743,14 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                     <Typography sx={{ fontSize: '0.7rem' }}>{Number(totalIgstAmount).toFixed(2)}</Typography>
                                 </Box>
                             </Box>
-                        </Box>
+                        </Box> */}
                         <Divider sx={{ my: 2 }} />
 
                         <Box>
-                            <Typography sx={{ fontSize: '0.7rem', mb: 1 }}>Total Invoice Value (In figure): {Number(totalAmount).toFixed(2)}</Typography>
+                            <Box display="flex" sx={{mb:2 , alignItems:'center'}}>
+                            <Typography sx={{ fontSize: '0.7rem'}}>Total Invoice Value (In figure):</Typography>
+                            <Typography sx={{fontWeight: 'bold', fontSize: '1rem'}}> {Number(totalAmount).toFixed(2)}</Typography>
+                            </Box>
                             <Typography sx={{ fontSize: '0.7rem', mb: 2 }}>Total Invoice Value (In Words): {convertToWords(totalAmount)}</Typography>
                         </Box>
 

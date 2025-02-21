@@ -73,13 +73,22 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId, onS
             if (event.shiftKey && event.key.toLowerCase() === 'a') {
                 event.preventDefault();
                 openModal();
+            } else if (event.key === 'Enter' && !event.shiftKey) {
+                // Prevent form submission if the target is an input field in a modal or autocomplete
+                const target = event.target as HTMLElement;
+                if (target.tagName === 'INPUT' && 
+                    (target.closest('.MuiDialog-root') || target.closest('.MuiAutocomplete-root'))) {
+                    return;
+                }
+                event.preventDefault();
+                handleSubmit(event as unknown as React.FormEvent);
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
-    console.log("InvoiceForm invoiceId:", invoiceId);
+    console.log("Quotation invoiceId:", invoiceId);
     const { user, activeShop } = useAuth();
     const [billToOptions, setBillToOptions] = useState<billToAddresses[]>([]);
     const [shipToOptions, setShipToOptions] = useState<shipToAddresses[]>([]);
@@ -426,7 +435,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId, onS
                         onClick={() => openModal()}
                         sx={{ fontSize: '0.6rem' }}
                     >
-                        Add Item (Alt+A)
+                        Add Item (Shift+A)
                     </Button>
                 </Box>
                 <IconButton onClick={onClose} size="small">
@@ -726,7 +735,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId, onS
 
                         <Divider />
                         <InvoiceTable items={items} onEdit={openModal} onDelete={deleteItem} />
-                        <Box display="flex" justifyContent="flex-end" mt={1}>
+                        {/* <Box display="flex" justifyContent="flex-end" mt={1}>
                             <Box width="200px">
                                 <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>TOTAL</Typography>
                                 <Box display="flex" justifyContent="space-between">
@@ -736,11 +745,14 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId, onS
                                     <Typography sx={{ fontSize: '0.7rem' }}>{Number(totalIgstAmount).toFixed(2)}</Typography>
                                 </Box>
                             </Box>
-                        </Box>
+                        </Box> */}
                         <Divider sx={{ my: 2 }} />
 
                         <Box>
-                            <Typography sx={{ fontSize: '0.7rem', mb: 1 }}>Total Invoice Value (In figure): {Number(totalAmount).toFixed(2)}</Typography>
+                            <Box display="flex" sx={{mb:2 , alignItems:'center'}}>
+                                <Typography sx={{ fontSize: '0.7rem'}}>Total Invoice Value (In figure):</Typography>
+                                <Typography sx={{fontWeight: 'bold', fontSize: '1rem'}}> {Number(totalAmount).toFixed(2)}</Typography>
+                            </Box>
                             <Typography sx={{ fontSize: '0.7rem', mb: 2 }}>Total Invoice Value (In Words): {convertToWords(totalAmount)}</Typography>
                         </Box>
 
@@ -758,7 +770,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId, onS
                         </Box>
 
                         <Button type="submit" variant="contained" color="primary" sx={{ mt: 2, fontSize: '0.6rem' }}>
-                            Submit Quotation
+                            Submit Quotation (Enter)
                         </Button>
                     </Stack>
                 </form>

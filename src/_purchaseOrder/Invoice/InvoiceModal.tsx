@@ -109,12 +109,26 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ item, onSave, onClose }) =>
       igstAmount,
     };
     onSave(newItem);
+    // Focus on the submit button after saving
+    setTimeout(() => {
+      const submitButton = document.querySelector('button[type="submit"]');
+      if(submitButton instanceof HTMLElement){
+        submitButton.focus();
+      }
+    }, 100);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    const isAutocompleteOpen = document.querySelector('.MuiAutocomplete-popper') !== null;
+    if (event.key === 'Enter' && !event.shiftKey && !isAutocompleteOpen) {
+      event.preventDefault();
+      handleSave();
+    }
+  }
   return (
     <Dialog open={true} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ fontSize: '0.7rem' }}>{item ? 'Edit Item' : 'Add Item'}</DialogTitle>
-      <DialogContent sx={{ fontSize: '0.6rem' }}>
+      <DialogContent sx={{ fontSize: '0.6rem' }} onKeyDown={handleKeyDown} >
         <Stack spacing={1}>
           <Autocomplete
             freeSolo
@@ -234,7 +248,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ item, onSave, onClose }) =>
             Create Product
           </Button>
         )}
-        <Button onClick={handleSave} variant="contained" color="primary" sx={{ fontSize: '0.6rem', mr: 1 }}>Save</Button>
+        <Button onClick={handleSave} variant="contained" color="primary" sx={{ fontSize: '0.6rem', mr: 1 }}>Save(Enter)</Button>
         <Button onClick={onClose} variant="outlined" sx={{ fontSize: '0.6rem' }}>Cancel</Button>
       </DialogActions>
     </Dialog>

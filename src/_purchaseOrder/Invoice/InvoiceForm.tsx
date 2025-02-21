@@ -86,7 +86,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
-    console.log("InvoiceForm invoiceId:", invoiceId);
+    console.log("Purchase form invoiceId:", invoiceId);
     const { user, activeShop } = useAuth();
     const [billToOptions, setBillToOptions] = useState<billToAddresses[]>([]);
     const [shipToOptions, setShipToOptions] = useState<shipToAddresses[]>([]);
@@ -420,7 +420,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <Box display="flex" alignItems="center" gap={2}>
                     <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 600 }}>
-                        Invoice Form
+                        Purchase Form
                     </Typography>
                     <IconButton onClick={() => setEditMode(!editMode)} size="small" sx={{ ml: 1 }}>
                         {editMode ? <CloseIcon /> : <EditIcon />}
@@ -432,7 +432,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                         onClick={() => openModal()}
                         sx={{ fontSize: '0.6rem' }}
                     >
-                        Add Item (Alt+A)
+                        Add Item (Shift+A)
                     </Button>
                 </Box>
                 <IconButton onClick={onClose} size="small">
@@ -732,7 +732,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
 
                         <Divider />
                         <InvoiceTable items={items} onEdit={openModal} onDelete={deleteItem} />
-                        <Box display="flex" justifyContent="flex-end" mt={1}>
+                        {/* <Box display="flex" justifyContent="flex-end" mt={1}>
                             <Box width="200px">
                                 <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>TOTAL</Typography>
                                 <Box display="flex" justifyContent="space-between">
@@ -742,11 +742,14 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                                     <Typography sx={{ fontSize: '0.7rem' }}>{Number(totalIgstAmount).toFixed(2)}</Typography>
                                 </Box>
                             </Box>
-                        </Box>
+                        </Box> */}
                         <Divider sx={{ my: 2 }} />
 
                         <Box>
-                            <Typography sx={{ fontSize: '0.7rem', mb: 1 }}>Total Invoice Value (In figure): {Number(totalAmount).toFixed(2)}</Typography>
+                            <Box display="flex" sx={{mb:2 , alignItems:'center'}}>
+                                <Typography sx={{ fontSize: '0.7rem'}}>Total Invoice Value (In figure):</Typography>
+                                <Typography sx={{fontWeight: 'bold', fontSize: '1rem'}}> {Number(totalAmount).toFixed(2)}</Typography>
+                            </Box>
                             <Typography sx={{ fontSize: '0.7rem', mb: 2 }}>Total Invoice Value (In Words): {convertToWords(totalAmount)}</Typography>
                         </Box>
 
@@ -764,7 +767,7 @@ const InvoiceForm: React.FC<InvoiceForm> = React.memo(({ onClose, invoiceId }) =
                         </Box>
 
                         <Button type="submit" variant="contained" color="primary" sx={{ mt: 2, fontSize: '0.6rem' }}>
-                            Submit Purchase Invoice
+                            Submit Purchase Invoice (Enter)
                         </Button>
                     </Stack>
                 </form>

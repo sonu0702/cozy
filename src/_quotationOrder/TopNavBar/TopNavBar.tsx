@@ -25,7 +25,7 @@ export default function TopNavBar({onOpenForm} : TopNavBarProps) {
         startIcon={<IconShoppingCart size={16} />}
         style={{ justifyContent: "flex-start" }}
       >
-        New Quotation
+        New Quotation (Shift + A)
       </Button>
     </Stack>
   );
