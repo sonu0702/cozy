@@ -41,18 +41,18 @@ function Nav() {
             >
                 Dashboard
             </Button>
-            {/* <Button
+            <Button
                 fullWidth
                 // href={'/inventory'}
                 onClick={() => handleNavigation('/inventory')}
-                variant={currentPath === '/inventory' ? 'lightContained' : 'darkContained'}
+                variant={currentPath === '/inventory' ? 'lightContained' : undefined}
                 // target="_blank"
                 style={{ justifyContent: 'flex-start' }}
                 startIcon={<IconPackage size={16} />}
 
             >
                 Inventory
-            </Button> */}
+            </Button>
             <Button
                 fullWidth
                 // href={'/salesorder'}

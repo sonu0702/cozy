@@ -18,12 +18,17 @@ import {
 } from "react";
 import { debounce } from "lodash";
 import { IconSearch } from "@tabler/icons-react";
+import { productListSearchDescription } from "@/_global/api/api";
+import { useAuth } from "@/_global/components/context/AuthContext";
 
 export default function SearchBar() {
   const [options, setOptions] = useState<any[] | null>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(false);
+  const {activeShop} = useAuth();
   const theme = useTheme();
   const ref = useRef<HTMLInputElement>();
-  const loading = options === null;
+
 
   /**
    * @function trackKeyDownEvent - When user clicks (cntrl+/) shortcut
@@ -42,24 +47,26 @@ export default function SearchBar() {
     window.addEventListener("keydown", trackKeyDownEvent);
     return () => window.removeEventListener("keydown", trackKeyDownEvent);
   }, [trackKeyDownEvent]);
-  const debounceSearch = useMemo(
-    () =>
-      debounce(async (searchText: string) => {
-        try {
-          const len = searchText.trim().length;
-          if (len > 0 && len < 100) {
-            setOptions(null);
-            // const options = await getSearchToken(searchText);
-            // setOptions(options);
-          }
-        } catch (err) {
-          console.log("err", err);
-          //   handleErrorMessage(err);
-          setOptions([]);
-        }
-      }, 1000),
-    [],
-  );
+
+
+  const debouncedSearch = debounce(async (query: string) => {
+    if (query.length >= 2 && activeShop?.id) {
+      setLoading(true);
+      try {
+        const results = await productListSearchDescription(activeShop.id, query);
+        console.log("query",query);
+        setOptions(results);
+        console.log("query",query);
+      } catch (error) {
+        console.error('Error searching products:', error);
+        setOptions([]);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setOptions([]);
+    }
+  }, 300);
 
   return (
     <Autocomplete
@@ -70,15 +77,23 @@ export default function SearchBar() {
       options={options ?? []}
       loading={loading}
       loadingText="Loading..."
-      renderOption={(props, option, state, ownerState) => {
-        return <Box>Render options</Box>;
+      getOptionLabel={(option) => `${option.name} | ${option.hsn} | ${option.category}`}
+      renderOption={(props, option) => {
+        const { key, ...otherProps } = props;
+        return (
+          <Box component="li" key={key} {...otherProps}>
+            <Typography>
+              {option.name} | {option.hsn} | {option.category}
+            </Typography>
+          </Box>
+        );
       }}
       renderInput={(params) => (
         <TextField
           {...params}
           size="small"
-          placeholder="hi"
-          onChange={(e) => debounceSearch(e.target.value)}
+          placeholder="Search products by name, code or type"
+          onChange={(e) => debouncedSearch(e.target.value)}
           inputRef={ref}
           inputProps={{
             ...params.inputProps,

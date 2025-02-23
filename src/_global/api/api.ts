@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RegisterRequest, LoginRequest, AuthResponse, UpdateShopRequest, ShopResponse, ShopsListResponse, CreateInvoiceRequest, InvoiceResponse, InvoicesListResponse, billToAddresses, BillToAddressesListResponse, shipToAddresses, ShipToAddressesListResponse, searchProductList, SearchProductListResponse, DailySalesResponse, YearlySalesResponse, ProductsCountResponse, Product, ProductResponse, InvoiceType, MonthlySalesResponse } from './types';
+import { RegisterRequest, LoginRequest, AuthResponse, UpdateShopRequest, ShopResponse, ShopsListResponse, CreateInvoiceRequest, InvoiceResponse, InvoicesListResponse, billToAddresses, BillToAddressesListResponse, shipToAddresses, ShipToAddressesListResponse, searchProductList, SearchProductListResponse, DailySalesResponse, YearlySalesResponse, ProductsCountResponse, Product, ProductResponse, InvoiceType, MonthlySalesResponse, ProductListResponse } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -151,6 +151,12 @@ export const monthlySalesAnalytics = async (shopId:string): Promise<MonthlySales
 
 export const createProduct = async (shopId:string, data: Product): Promise<ProductResponse> => {
   const response = await api.post<ProductResponse>(`/shops/${shopId}/products`, data);
+  return response.data;
+};
+
+
+export const listProduct = async (shopId:string, page: number=1, limit: number=10): Promise<ProductListResponse> => {
+  const response = await api.get<ProductListResponse>(`/shops/${shopId}/products?page=${page}&limit=${limit}`);
   return response.data;
 };
 

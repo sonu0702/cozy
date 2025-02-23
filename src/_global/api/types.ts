@@ -261,3 +261,17 @@ export interface ProductResponse {
   message: string;
   data: Product;
 }
+
+export interface ProductListResponse {
+  success: boolean;
+  message: string;
+  data: {
+    products:Product[];
+    pagination: {
+      "total": number;
+      "page": number;
+      "limit": number;
+      "total_pages": number;
+    }
+  }
+}

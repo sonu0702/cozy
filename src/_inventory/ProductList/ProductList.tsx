@@ -1,9 +1,12 @@
 'use client';
+import { listProduct } from "@/_global/api/api";
+import { useAuth } from "@/_global/components/context/AuthContext";
 import {
     Box, Button, Pagination, PaginationItem, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Typography
 } from "@mui/material";
-import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
+import { IconArrowLeft, IconArrowRight, IconRefresh } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 export const productList = [
@@ -75,72 +78,154 @@ export type SupplierListProps = {
 
 export default function ProductList({onEditClick }:SupplierListProps ) {
     const [pageNumber, setPageNumber] = useState(2);
+    const {activeShop} = useAuth();
+    const limit = 5;
+
+    const { data: productListData, isLoading, error, refetch,isFetching} = useQuery({
+        queryKey: ['product-list', activeShop?.id, pageNumber],
+        queryFn: () => listProduct(activeShop?.id as string, pageNumber, limit),
+        enabled:!!activeShop?.id,
+    });
+    if (isLoading) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" height="200px">
+                <Typography>Loading...</Typography>
+            </Box>
+        );
+    }
+    if(error) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" height="200px">
+                <Typography>Error: {error.message}</Typography>
+            </Box>
+        );
+    }
+
+    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+        setPageNumber(value);
+    };
+
     return (
         <Box marginTop={'2rem'}>
-            <Typography color={'grey.400'} variant="mdSemibold" pb={'1rem'}>
-                Product List
-            </Typography>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                <Typography color={'grey.700'} variant="mdSemibold" pb={'1rem'}>
+                    Product List
+                </Typography>
+                <Button
+                        variant="text"
+                        color="primary"
+                        startIcon={<IconRefresh
+                            size={16}
+                            style={{
+                                animation: isFetching ? 'spin 1s linear infinite' : 'none'
+                            }}
+                        />}
+                        onClick={() => refetch()}
+                        disabled={isFetching}
+                    >
+                        {isFetching ? 'Refreshing...' : 'Refresh'}
+                </Button>
+            </Box>
             <TableContainer>
                 <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell sx={{ minWidth: '125px' }}>
-                                <Typography variant="xsSemibold" color={'grey.400'}>
+                                <Typography variant="smBold">
                                     Name
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{ minWidth: '125px' }}>
-                                <Typography variant="xsSemibold" color={'grey.400'}>
+                                <Typography variant="smBold">
                                     Code
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{ minWidth: '125px' }}>
-                                <Typography variant="xsSemibold" color={'grey.400'}>
+                                <Typography variant="smBold">
                                     Type
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{ minWidth: '110px' }}>
-                                <Typography variant="xsSemibold" color={'grey.400'}
+                                <Typography variant="smBold"
                                     textAlign={'right'}>
                                     Price
                                 </Typography>
                             </TableCell>
-                            <TableCell sx={{ minWidth: '110px' }}>
+                            {/* <TableCell sx={{ minWidth: '110px' }}>
                                 <Typography variant="xsSemibold" color={'grey.400'}
                                     textAlign={'right'}>
                                     Quantity
+                                </Typography>
+                            </TableCell> */}
+                            <TableCell sx={{ minWidth: '110px' }}>
+                                <Typography variant="smBold"
+                                    textAlign={'right'}>
+                                    CGST
+                                </Typography>
+                            </TableCell>
+                            <TableCell sx={{ minWidth: '110px' }}>
+                                <Typography variant="smBold"
+                                    textAlign={'right'}>
+                                    SGST
+                                </Typography>
+                            </TableCell>
+                            <TableCell sx={{ minWidth: '110px' }}>
+                                <Typography variant="smBold"
+                                    textAlign={'right'}>
+                                    IGST
+                                </Typography>
+                            </TableCell>
+                            <TableCell sx={{ minWidth: '110px' }}>
+                                <Typography variant="smBold"
+                                    textAlign={'right'}>
+                                    Discount
                                 </Typography>
                             </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {productList.map((product, index) => (
+                        {(productListData?.data?.products || []).map((product, index) => (
                             <TableRow key={product.id}
-                                sx={{ backgroundColor: index % 2 === 0 ? 'grey.800' : 'unset' }}
+                                sx={{ backgroundColor: index % 2 === 0 ? 'grey.200' : 'unset' }}
                             >
                                 <TableCell>
-                                    <Typography color={'grey.300'} variant="smRegular">
+                                    <Typography color={'grey.700'} variant="smRegular">
                                         {product.name}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
-                                    <Typography color={'grey.300'} variant="smRegular">
-                                        {product.code}
+                                    <Typography color={'grey.700'} variant="smRegular">
+                                        {product.hsn}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
-                                    <Typography color={'grey.300'} variant="smRegular">
-                                        {product.type.name}
+                                    <Typography color={'grey.700'} variant="smRegular">
+                                        {product.category}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
-                                    <Typography color={'grey.300'} variant="smRegular" textAlign={'right'}>
-                                        {`${product.price_currency} ${product.price}`}
+                                    <Typography color={'grey.700'} variant="smRegular" textAlign={'right'}>
+                                        {product.price}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
-                                    <Typography color={'grey.300'} variant="smRegular" textAlign={'right'}>
-                                        {product.quantity}
+                                    <Typography color={'grey.700'} variant="smRegular" textAlign={'right'}>
+                                        {product.cgst}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography color={'grey.700'} variant="smRegular" textAlign={'right'}>
+                                        {product.sgst}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography color={'grey.700'} variant="smRegular" textAlign={'right'}>
+                                        {product.igst}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography color={'grey.700'} variant="smRegular" textAlign={'right'}>
+                                        {product.discount_percent}
                                     </Typography>
                                 </TableCell>
                                 <TableCell sx={{ minWidth: '110px' }}>
@@ -167,20 +252,19 @@ export default function ProductList({onEditClick }:SupplierListProps ) {
                 <Button
                     variant="semiDarkContained"
                     disabled={pageNumber === 1}
-                    onClick={() => []}
+                    onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
                     startIcon={<IconArrowLeft size={16} />}
 
                 >
                     Prev
                 </Button>
-                <Pagination count={12}
+                <Pagination 
+                    count={Math.ceil((productListData?.data?.pagination.total || 0 )/ limit)}    
                     variant="text"
                     shape="rounded"
                     sx={{ mt: '2rem' }}
                     page={pageNumber}
-                    onChange={(event, value) => {
-                        return []
-                    }}
+                    onChange={handlePageChange}
                     siblingCount={3}
                     renderItem={(item) => <PaginationItem {...item} />}
                     hideNextButton={true}
@@ -188,8 +272,8 @@ export default function ProductList({onEditClick }:SupplierListProps ) {
                 />
                 <Button
                     variant="semiDarkContained"
-                    disabled={pageNumber === 1} // this will change
-                    onClick={() => []}
+                    disabled={pageNumber>= Math.ceil((productListData?.data?.pagination.total || 0) / limit)} // this will change
+                    onClick={() => setPageNumber(prev => prev + 1)}
                     startIcon={<IconArrowRight size={16} />}
 
                 >
